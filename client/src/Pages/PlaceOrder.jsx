@@ -11,7 +11,6 @@ const PlaceOrder = () => {
   const {
     navigate,
     backendUrl,
-    token,
     cartItems,
     setCartItems,
     getCartAmount,
@@ -33,7 +32,7 @@ const PlaceOrder = () => {
   const onChangeHandler = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-
+    // console.log(name, value);
     setFormData((data) => ({ ...data, [name]: value }));
   };
 
@@ -49,7 +48,6 @@ const PlaceOrder = () => {
               products.find((product) => product._id === items),
             );
             if (itemInfo) {
-              // itemInfo.size = item;
               itemInfo.quantity = cartItems[items][item];
               orderItems.push(itemInfo);
             }
@@ -59,14 +57,14 @@ const PlaceOrder = () => {
 
       let orderData = {
         address: formData,
-        items: orderItems,
+        product: orderItems,
         amount: getCartAmount() + deliveryFee,
       };
 
       switch (method) {
         case "cod":
-          const response = await axios.post(
-            backendUrl + "/api/order/place",
+          const {response} = await axios.post(
+            `${backendUrl}/order/place-order`,
             orderData,
             { withCredentials: true },
           );
@@ -79,16 +77,16 @@ const PlaceOrder = () => {
 
           break;
         case "stripe":
-          const responseStripe = await axios.post(
-            backendUrl + "/api/order/stripe",
+          const { data } = await axios.post(
+            `${backendUrl}/order/place-order-stripe`,
             orderData,
             { withCredentials: true },
           );
-          if (responseStripe.data.success) {
-            const { session_url } = responseStripe.data;
+          if (data.success) {
+            const { session_url } = data;
             window.location.replace(session_url);
           } else {
-            toast.error(responseStripe.data.message);
+            toast.error(data.message);
           }
           break;
 

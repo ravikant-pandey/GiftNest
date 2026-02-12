@@ -65,7 +65,6 @@ const loginSeller = asyncHandler(async (req, res) => {
   const { emailOrPhone, password } = req.body;
   if (!emailOrPhone) throw new ApiError(400, "Email or Phone is required.");
   if (!password) throw new ApiError(400, "Password is required.");
-  console.log(emailOrPhone, password);
   const seller = await Seller.findOne({
     $or: [{ email: emailOrPhone }, { phone: emailOrPhone }],
   });
@@ -179,7 +178,6 @@ const updateStoreAvatar = asyncHandler(async (req, res) => {
   try {
     const sellerId = req.seller._id;
     const avatarLocalPath = req.file?.path;
-    console.log(avatarLocalPath);
     if (!avatarLocalPath) throw new ApiError(400, "Logo is required");
     const avatar = await uploadOnCloudinary(avatarLocalPath);
     if (!avatar.url) {
@@ -278,13 +276,6 @@ const toggleSellerActive = asyncHandler(async (req, res) => {
     } successfully`,
     seller,
   });
-});
-
-// dashboard data (Total Revenue, Total Orders, Total Product, Average Order)
-const dashboardData = asyncHandler(async (req, res) => {
-  try {
-    const sellerId = req.seller._id;
-  } catch (error) {}
 });
 
 export {

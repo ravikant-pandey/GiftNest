@@ -23,7 +23,6 @@ const generateToken = async (adminId) => {
 
 const loginAdmin = asyncHandler(async (req, res) => {
   const { emailOrPhone, password } = req.body;
-  console.log(emailOrPhone, password);
 
   if (!emailOrPhone) throw new ApiError(400, "Email or Phone is required.");
   if (!password) throw new ApiError(400, "Password is required.");

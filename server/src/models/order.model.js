@@ -8,29 +8,16 @@ const orderSchema = new Schema(
       required: true,
     },
 
-    products: [
-      {
-        product: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-          required: true,
-        },
-        name: String,
-        price: Number,
-        image: String,
-        quantity: Number,
-      },
-    ],
-
-    shippingAddress: {
-      fullName: String,
-      phone: String,
-      address: String,
-      city: String,
-      postalCode: String,
-      country: String,
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
     },
-
+    
+    address: {
+      type: String,
+      required: true,
+    },
     paymentMethod: {
       type: String,
       enum: ["COD", "STRIPE"],
@@ -38,17 +25,10 @@ const orderSchema = new Schema(
     },
 
     isPaid: { type: Boolean, default: false },
-    paidAt: Date,
 
     status: {
       type: String,
-      enum: ["pending", "paid", "shipped", "delivered", "cancelled"],
-      default: "pending",
-    },
-
-    total: {
-      type: Number,
-      required: true,
+      default: "Order Placed",
     },
   },
   { timestamps: true },

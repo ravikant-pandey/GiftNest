@@ -26,8 +26,6 @@ const createProduct = asyncHandler(async (req, res) => {
   } = req.body;
 
   // Debug (optional)
-  console.log("BODY:", req.body);
-  console.log("FILES:", req.files);
 
   if (!title || !description || Number(price) < 1 || !category) {
     return res.status(400).json({
@@ -181,7 +179,6 @@ const updateProduct = asyncHandler(async (req, res) => {
 const getSingleProduct = asyncHandler(async (req, res) => {
   try {
     const { productId } = req.body;
-    console.log("Product ID:", productId);
 
     const product = await Product.findById(productId);
 

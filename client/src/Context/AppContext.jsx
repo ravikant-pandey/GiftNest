@@ -1,14 +1,18 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
+  // CONSTANTS
   const currency = "₹";
-  const delivery_fees = 50;
+  const delivery_fees = 99;
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const navigate = useNavigate();
 
+  // AUTH STATE
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem("isLoggedIn") === "true";
   });
@@ -18,10 +22,13 @@ const AppContextProvider = (props) => {
   });
 
   const [userData, setUserData] = useState(null);
+
+  // APP STATE
   const [visible, setVisible] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const [products, setProducts] = useState([]);
 
+  // PRODUCTS
   const getProducts = async () => {
     try {
       const { data } = await axios.get(backendUrl + "/product/products");
@@ -37,11 +44,8 @@ const AppContextProvider = (props) => {
     if (!products.length) getProducts();
   }, []);
 
+  // CART
   const addToCart = async (itemId) => {
-    // if (!size) {
-    //   return toast.error("Select Size");
-    // }
-
     let cartData = structuredClone(cartItems);
 
     if (cartData[itemId]) {
@@ -54,11 +58,18 @@ const AppContextProvider = (props) => {
       cartData[itemId] = {};
       cartData[itemId] = 1;
     }
+    toast.success("Item added to cart");
     setCartItems(cartData);
 
     if (isLoggedIn) {
       try {
-        await axios.post(backendUrl + "/cart/add", { itemId });
+        await axios.post(
+          backendUrl + "/cart/add-to-cart",
+          { productId: itemId },
+          {
+            withCredentials: true,
+          },
+        );
       } catch (error) {
         toast.error(error.message);
       }
@@ -72,12 +83,71 @@ const AppContextProvider = (props) => {
         if (cartItems[item] > 0) {
           totalCount += cartItems[item];
         }
-      } catch (error) {}
+      } catch (error) {
+        toast.error(error.message);
+      }
     }
     return totalCount;
   };
 
-  //  USER
+  const updateQuantity = async (itemId, quantity) => {
+    let cartData = structuredClone(cartItems);
+    cartData[itemId] = quantity;
+    setCartItems(cartData);
+    if (isLoggedIn) {
+      try {
+        await axios.put(
+          backendUrl + "/cart/update-cart",
+          { productId: itemId, quantity: quantity },
+          {
+            withCredentials: true,
+          },
+        );
+      } catch (error) {
+        toast.error(error.message);
+      }
+    }
+  };
+
+  const getCartData = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/cart/cart-data", {
+        withCredentials: true,
+      });
+      if (data.success) {
+        setCartItems(data.cart);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (isLoggedIn) getCartData();
+  }, [isLoggedIn]);
+
+  const getCartAmount = () => {
+    let amount = 0;
+
+    for (let itemId in cartItems) {
+      try {
+        const quantity = cartItems[itemId];
+
+        if (quantity > 0) {
+          const product = products.find((p) => p._id === itemId);
+          if (product) {
+            amount += quantity * product.price;
+          }
+        }
+      } catch (error) {
+        toast.error(error.message);
+      }
+    }
+
+    return amount;
+  };
+
+  // USER
   const getUserData = async () => {
     try {
       const { data } = await axios.get(`${backendUrl}/user/current-user`, {
@@ -92,21 +162,7 @@ const AppContextProvider = (props) => {
     if (isLoggedIn && token) getUserData();
   }, [isLoggedIn]);
 
-  useEffect(() => {}, [cartItems]);
-
-  const getCartAmount = () => {
-    let amount = 0;
-    for (let item in cartItems) {
-      try {
-        if (cartItems[item] > 0) {
-          const product = products.find((product) => product._id === item);
-          amount += cartItems[item] * product.price;
-        }
-      } catch (error) {}
-    }
-    return amount;
-  };
-
+  // CONTEXT VALUE
   const value = {
     products,
     currency,
@@ -120,17 +176,24 @@ const AppContextProvider = (props) => {
     setUserData,
     getUserData,
 
+    // ui
     visible,
     setVisible,
+
+    // cart
     cartItems,
     setCartItems,
     addToCart,
     getCartCount,
+    getCartAmount,
+    updateQuantity,
+
+    // misc
     token,
     setToken,
     getProducts,
-    deliveryFee: delivery_fees,
-    navigate: props.navigate,
+    delivery_fees,
+    navigate,
   };
 
   return (

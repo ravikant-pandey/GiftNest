@@ -176,14 +176,20 @@ function Navbar() {
 
               {openMoreDropdown && (
                 <div className="absolute mt-3 right-0 bg-white shadow-md rounded border w-[220px] p-2 text-sm z-50">
-                  <p
-                    onClick={() => navigate("/admin")}
-                    className="cursor-pointer hover:bg-gray-100 p-2"
-                  >
-                    Admin
-                  </p>
                   <a
                     href="http://localhost:5174"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <p
+                      onClick={() => navigate("/admin")}
+                      className="cursor-pointer hover:bg-gray-100 p-2"
+                    >
+                      Admin
+                    </p>
+                  </a>
+                  <a
+                    href="http://localhost:5175"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -261,7 +267,7 @@ function Navbar() {
             </NavLink>
             <a
               href="http://localhost:5174"
-              target="_self"
+              target="_blank"
               rel="noopener noreferrer"
             >
               <p className="cursor-pointer hover:bg-gray-100 p-2">

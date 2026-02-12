@@ -1,6 +1,7 @@
 import { assets } from "../../assets/frontend_assets/assets";
 
 function Search() {
+  
   return (
     <div className="w-full relative">
       <img

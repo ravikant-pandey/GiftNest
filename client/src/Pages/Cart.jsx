@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Title from "../components/Title/Title";
 import { assets } from "../assets/frontend_assets/assets";
 import CartTotal from "../components/CartTotal/CartTotal";
@@ -7,21 +7,20 @@ import { AppContext } from "../Context/AppContext";
 const Cart = () => {
   const { products, currency, cartItems, updateQuantity, navigate } =
     useContext(AppContext);
+
   const [cartData, setCartData] = useState([]);
 
+  //  convert cart object → array
   useEffect(() => {
     if (products.length > 0) {
       const tempData = [];
 
-      for (const items in cartItems) {
-        for (const item in cartItems[items]) {
-          if (cartItems[items][item] > 0) {
-            tempData.push({
-              _id: items,
-              size: item,
-              quantity: cartItems[items][item],
-            });
-          }
+      for (const itemId in cartItems) {
+        if (cartItems[itemId] > 0) {
+          tempData.push({
+            _id: itemId,
+            quantity: cartItems[itemId],
+          });
         }
       }
 
@@ -34,65 +33,69 @@ const Cart = () => {
       <div className="text-2xl mb-3">
         <Title text1={"YOUR"} text2={"CART"} />
       </div>
+
       <div>
         {cartData.map((item, index) => {
           const productData = products.find(
-            (product) => product._id === item._id
+            (product) => product._id === item._id,
           );
+
+          if (!productData) return null;
+
           return (
             <div
               key={index}
               className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
             >
-              <div className=" flex items-start gap-6">
-                <img className="w-16 sm:w-20" src={productData.image[0]} />
+              {/* Product Info */}
+              <div className="flex items-start gap-6">
+                <img className="w-16 sm:w-20" src={productData.images[0]} />
                 <div>
                   <p className="text-xs sm:text-lg font-medium">
-                    {productData.name}
+                    {productData.title}
                   </p>
                   <div className="flex items-center gap-5 mt-2">
                     <p>
                       {currency}
                       {productData.price}
                     </p>
-                    {/* <p className="px-2 sm:px-3 sm:py-1 border bg-slate-50">
-                      {item.size}
-                    </p> */}
                   </div>
                 </div>
               </div>
+
+              {/* Quantity */}
               <input
                 className="border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1"
                 type="number"
                 min={1}
-                defaultValue={item.quantity}
+                value={item.quantity}
                 onChange={(e) =>
-                  e.target.value === "" || e.target.value === 0
-                    ? null
-                    : updateQuantity(
-                        item._id,
-                        // item.size,
-                        Number(e.target.value)
-                      )
+                  e.target.value === "" || e.target.value === "0"
+                    ? updateQuantity(item._id, 0)
+                    : updateQuantity(item._id, Number(e.target.value))
                 }
               />
+
+              {/* Delete */}
               <img
                 className="w-4 mr-4 sm:w-5 cursor-pointer"
                 src={assets.bin_icon}
                 alt="bin_icon"
-                onClick={() => updateQuantity(item._id, item.size, 0)}
+                onClick={() => updateQuantity(item._id, 0)}
               />
             </div>
           );
         })}
       </div>
+
       <div className="flex justify-end my-20">
         <div className="w-full sm:w-[450px]">
           <CartTotal />
-          <div className=" w-full text-end">
+
+          <div className="w-full text-end">
             <button
               onClick={() => navigate("/place-order")}
-              className="bg-black text-white text-sm my-8 px-8 py-3"
+              className="bg-black text-white text-sm my-8 px-8 py-3 cursor-pointer active:bg-gray-700 rounded-2xl"
             >
               PROCEED TO CHECKOUT
             </button>
