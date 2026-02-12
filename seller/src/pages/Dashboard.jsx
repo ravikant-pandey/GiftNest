@@ -4,9 +4,11 @@ import { AppContext } from "../context/AppContext";
 import {
   FiDollarSign,
   FiShoppingBag,
-  FiUsers,
+  
   FiBarChart,
 } from "react-icons/fi";
+import { MdOutlineProductionQuantityLimits } from "react-icons/md";
+
 import { assets } from "../assets/admin_assets/assets";
 import { Edit } from "lucide-react";
 import axios from "axios";
@@ -126,11 +128,11 @@ const Dashboard = () => {
             value={`${currency}${vendorData.totalSales}`}
           />
           <StatCard
-            icon={FiShoppingBag}
+            icon={MdOutlineProductionQuantityLimits}
             title="Total Orders"
             value={vendorData.totalOrders}
           />
-          <StatCard icon={FiUsers} title="Customers" value="124" />
+          <StatCard icon={FiShoppingBag} title="Total Product" value="124" />
           <StatCard
             icon={FiBarChart}
             title="Average Order"

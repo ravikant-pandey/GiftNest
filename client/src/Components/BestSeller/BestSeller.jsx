@@ -12,7 +12,10 @@ function BestSeller() {
   const itemsPerPage = 5;
 
   useEffect(() => {
-    const bestProduct = products.filter((product) => product.bestseller);
+    const bestProduct = products.filter(
+      (product) => product.bestseller && product.featured,
+    );
+
     setBestSeller(bestProduct);
     setCurrentPage(1);
   }, [products]);
@@ -30,19 +33,20 @@ function BestSeller() {
       <div className="text-center py-8 text-2xl md:text-3xl">
         <Title text1="BEST" text2="SELLERS" />
         <p className="w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600">
-          Discover the best sellers that define quality, style, and timeless appeal.
+          Discover the best sellers that define quality, style, and timeless
+          appeal.
         </p>
       </div>
 
       {/* Products */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 gap-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 gap-y-6">
         {paginatedProducts.map((product) => (
           <ProductItems
             key={product._id}
             id={product._id}
-            name={product.name}
+            title={product.title}
             price={product.price}
-            image={product.image}
+            images={product.images}
           />
         ))}
       </div>

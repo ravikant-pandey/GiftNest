@@ -253,6 +253,7 @@ const sellerData = asyncHandler(async (req, res) => {
   }
 });
 
+// toggle for active
 const toggleSellerActive = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -277,6 +278,13 @@ const toggleSellerActive = asyncHandler(async (req, res) => {
     } successfully`,
     seller,
   });
+});
+
+// dashboard data (Total Revenue, Total Orders, Total Product, Average Order)
+const dashboardData = asyncHandler(async (req, res) => {
+  try {
+    const sellerId = req.seller._id;
+  } catch (error) {}
 });
 
 export {

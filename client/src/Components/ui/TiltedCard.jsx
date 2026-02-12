@@ -11,10 +11,10 @@ export default function TiltedCard({
   imageSrc,
   altText = "Tilted card image",
   captionText = "",
-  containerHeight = "300px",
+  containerHeight = "100%",
   containerWidth = "100%",
-  imageHeight = "250px",
-  imageWidth = "250px",
+  imageHeight = "100%",
+  imageWidth = "100%",
   scaleOnHover = 1.1,
   rotateAmplitude = 14,
   showMobileWarning = true,
@@ -84,8 +84,7 @@ export default function TiltedCard({
       onMouseLeave={handleMouseLeave}
     >
       {showMobileWarning && (
-        <div className="absolute top-4 text-center text-sm block sm:hidden">
-        </div>
+        <div className="absolute top-4 text-center text-sm block sm:hidden"></div>
       )}
 
       <motion.div

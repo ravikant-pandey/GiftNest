@@ -37,4 +37,5 @@ router.put("/store-status/:id", verifyAdmin, storeApprove);
 router.get("/seller-data", verifyAdmin, sellerData);
 router.put("/is-active/:id", verifyAdmin, toggleSellerActive);
 
+
 export default router;

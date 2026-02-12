@@ -17,27 +17,29 @@ const RelatedProducts = ({ category, subCategory }) => {
       setRelated(productsCopy.slice(0, 5));
     }
   }, [products]);
+  
+ if (related.featured) return null;
 
-  return (
-    <div className="my-24">
-      <div className="text-center text-3xl py-2">
-        <Title text1={"RELATED"} text2={"PRODUCTS"} />
-      </div>
-      <div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
-          {related.map((item, index) => (
-            <ProductItem
-              key={index}
-              id={item._id}
-              name={item.name}
-              price={item.price}
-              image={item.image}
-            />
-          ))}
+    return (
+      <div className="my-24">
+        <div className="text-center text-3xl py-2">
+          <Title text1={"RELATED"} text2={"PRODUCTS"} />
+        </div>
+        <div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-5 gap-4 gap-y-6">
+            {related.map((item, index) => (
+              <ProductItem
+                key={index}
+                id={item._id}
+                title={item.title}
+                price={item.price}
+                images={item.images}
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default RelatedProducts;

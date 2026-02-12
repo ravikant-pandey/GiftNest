@@ -167,7 +167,7 @@ const Add = () => {
             <option value="wedding">Wedding</option>
             <option value="anniversary">Anniversary</option>
             <option value="flowers">Flowers</option>
-            <option value="customized">Customized</option>
+            <option value="customizable">Customized</option>
             <option value="chocolates">Chocolates</option>
             <option value="plants">Plants</option>
           </select>
@@ -182,9 +182,9 @@ const Add = () => {
             <option value="" disabled selected>
               Select one
             </option>
-            <option value="Men">Men</option>
-            <option value="Women">Women</option>
-            <option value="Kids">Kids</option>
+            <option value="men">Men</option>
+            <option value="women">Women</option>
+            <option value="kids">Kids</option>
           </select>
         </div>
         <div>

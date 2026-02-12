@@ -1,7 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { products } from "../assets/frontend_assets/assets";
 
 export const AppContext = createContext();
 
@@ -21,7 +20,22 @@ const AppContextProvider = (props) => {
   const [userData, setUserData] = useState(null);
   const [visible, setVisible] = useState(false);
   const [cartItems, setCartItems] = useState({});
-  // const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]);
+
+  const getProducts = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/product/products");
+      if (data.success) {
+        setProducts(data.products);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (!products.length) getProducts();
+  }, []);
 
   const addToCart = async (itemId) => {
     // if (!size) {
@@ -114,7 +128,7 @@ const AppContextProvider = (props) => {
     getCartCount,
     token,
     setToken,
-    getCartAmount,
+    getProducts,
     deliveryFee: delivery_fees,
     navigate: props.navigate,
   };

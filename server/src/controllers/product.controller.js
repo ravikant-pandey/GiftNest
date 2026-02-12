@@ -177,6 +177,34 @@ const updateProduct = asyncHandler(async (req, res) => {
   }
 });
 
+// get single product
+const getSingleProduct = asyncHandler(async (req, res) => {
+  try {
+    const { productId } = req.body;
+    console.log("Product ID:", productId);
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      product,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 export {
   getAllProducts,
   createProduct,
@@ -184,4 +212,5 @@ export {
   deleteProduct,
   toggleFeatured,
   updateProduct,
+  getSingleProduct,
 };

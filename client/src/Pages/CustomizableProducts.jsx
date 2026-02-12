@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { products } from "../assets/frontend_assets/assets";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TiltedCard from "../Components/ui/TiltedCard";
 import Title from "../Components/Title/Title";
+import { AppContext } from "../context/AppContext";
 
 export default function CustomizableProducts() {
   const navigate = useNavigate();
+  const { products } = useContext(AppContext);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -29,23 +30,33 @@ export default function CustomizableProducts() {
         <Title text1={"CUSTOMIZABLE"} text2={"CHoose one image"} />
       </div>
       {/* Products */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 gap-y-6">
-        {paginatedProducts.map((product) => (
-          <div
-            key={product._id}
-            onClick={() => navigate(`/customize/${product._id}`)}
-            className="border rounded-lg p-4  cursor-pointer hover:shadow-lg transition"
-          >
-            <TiltedCard
-              imageSrc={product.image[0]}
-              altText={product.name}
-              captionText={"Customize Now"}
-            />
-            <p className="text-center mt-2 font-medium">{product.name}</p>
-          </div>
-        ))}
-      </div>
+      {customizableProducts.length === 0 ? (
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <p className="text-gray-500 text-lg text-center">
+            No customizable products available right now.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 gap-y-6">
+          {paginatedProducts.map((product) => (
+            <div
+              key={product._id}
+              onClick={() => navigate(`/customize/${product._id}`)}
+              className="border rounded-lg p-4 cursor-pointer hover:shadow-lg transition"
+            >
+              <div className="aspect-[4/5]">
+                <TiltedCard
+                  imageSrc={product.images?.[0]}
+                  altText={product.title}
+                  captionText={"Customize Now"}
+                />
+              </div>
 
+              <p className="text-center mt-2 font-medium">{product.title}</p>
+            </div>
+          ))}
+        </div>
+      )}
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-6 gap-2 items-center">

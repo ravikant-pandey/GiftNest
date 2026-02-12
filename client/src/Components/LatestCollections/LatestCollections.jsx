@@ -12,10 +12,14 @@ function LatestCollections() {
   const itemsPerPage = 5;
 
   useEffect(() => {
-    // get latest 10 products
-    setLatestProducts(products.slice(0, 10));
+    const filtered = products
+      .filter((p) => p.featured === true) //  featured only
+      .slice(0, 10); // latest 10
+
+    setLatestProducts(filtered);
     setCurrentPage(1);
   }, [products]);
+
 
   // Pagination logic
   const totalPages = Math.ceil(latestProducts.length / itemsPerPage);
@@ -25,12 +29,15 @@ function LatestCollections() {
     startIndex + itemsPerPage,
   );
 
+  if (latestProducts.featured) return null;
+
   return (
     <div className="mt-6">
       <div className="text-center py-8 text-2xl md:text-3xl">
         <Title text1="Latest" text2="Collections" />
         <p className="w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600">
-          Explore the latest collection where timeless elegance meets modern design.
+          Explore the latest collection where timeless elegance meets modern
+          design.
         </p>
       </div>
 
@@ -40,9 +47,9 @@ function LatestCollections() {
           <ProductItems
             key={product._id}
             id={product._id}
-            name={product.name}
+            title={product.title}
             price={product.price}
-            image={product.image}
+            images={product.images}
           />
         ))}
       </div>

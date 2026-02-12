@@ -2,7 +2,6 @@ import { Stage, Layer, Image, Text, Transformer } from "react-konva";
 import { useEffect, useRef, useState, useContext } from "react";
 import useImage from "use-image";
 import { useParams } from "react-router-dom";
-import { products } from "../assets/frontend_assets/assets";
 import Title from "../Components/Title/Title";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-hot-toast";
@@ -12,6 +11,7 @@ const DESIGN_HEIGHT = 420;
 
 export default function GiftEditor() {
   const { id } = useParams();
+  const { products, addToCart } = useContext(AppContext);
 
   const stageRef = useRef(null);
   const trRef = useRef(null);
@@ -19,10 +19,11 @@ export default function GiftEditor() {
   const textRef = useRef(null);
   const containerRef = useRef(null);
 
-  const { addToCart } = useContext(AppContext);
   const productData = products.find((p) => p._id == id);
 
-  const [baseImage] = useImage(productData?.image[0]);
+  // ⭐ FIX 1 — images instead of image
+  const [baseImage] = useImage(productData?.images?.[0]);
+
   const [userImageURL, setUserImageURL] = useState(null);
   const [userImage] = useImage(userImageURL);
 
@@ -30,6 +31,7 @@ export default function GiftEditor() {
   const [selected, setSelected] = useState(null);
   const [scale, setScale] = useState(1);
 
+  // Responsive canvas scale
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -44,6 +46,7 @@ export default function GiftEditor() {
     return () => window.removeEventListener("resize", resize);
   }, []);
 
+  // Transformer selection
   useEffect(() => {
     if (!trRef.current) return;
     if (selected === "image" && imgRef.current)
@@ -57,7 +60,7 @@ export default function GiftEditor() {
 
     addToCart({
       productId: productData._id,
-      name: productData.name,
+      name: productData.title, // ⭐ FIX 2 — title instead of name
       price: productData.price,
       customText: text,
       customDesign: designImage,
@@ -73,13 +76,15 @@ export default function GiftEditor() {
 
   return (
     <div className="min-h-screen bg-gray-100 overflow-x-hidden">
+      {/* Header */}
       <div className="w-full bg-white shadow-sm py-6">
         <div className="max-w-[1400px] text-2xl md:text-3xl mx-auto text-center px-4">
-          <Title text1="Customize" text2={productData.name} />
+          <Title text1="Customize" text2={productData.title} />
         </div>
       </div>
 
       <div className="flex flex-col-reverse md:flex-row">
+        {/* Left Panel */}
         <div className="w-full md:w-[360px] bg-white shadow p-4 space-y-4">
           <label className="block border-2 border-dashed rounded-lg p-4 text-center cursor-pointer">
             <input
@@ -114,11 +119,9 @@ export default function GiftEditor() {
           </button>
         </div>
 
-        <div className="flex-1 flex items-center justify-center p-4 overflow-hidden ">
-          <div
-            ref={containerRef}
-            className="w-full mt-10 max-w-[520px] overflow-hidden"
-          >
+        {/* Canvas */}
+        <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
+          <div ref={containerRef} className="w-full mt-10 max-w-[520px]">
             <Stage
               ref={stageRef}
               width={DESIGN_WIDTH}
@@ -134,11 +137,12 @@ export default function GiftEditor() {
               onTouchStart={() => setSelected(null)}
             >
               <Layer>
+                {/* ⭐ FIX 3 — full canvas height */}
                 {baseImage && (
                   <Image
                     image={baseImage}
                     width={DESIGN_WIDTH}
-                    height={400}
+                    height={DESIGN_HEIGHT}
                     listening={false}
                   />
                 )}

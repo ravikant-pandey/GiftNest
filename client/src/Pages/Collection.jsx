@@ -47,13 +47,17 @@ const Collection = () => {
 
     if (selectedCategory.length > 0) {
       filtered = filtered.filter((item) =>
-        selectedCategory.includes(item.category),
+        selectedCategory.some(
+          (cat) => cat.toLowerCase() === item.category?.toLowerCase(),
+        ),
       );
     }
 
     if (selectedSubCategory.length > 0) {
       filtered = filtered.filter((item) =>
-        selectedSubCategory.includes(item.subCategory),
+        selectedSubCategory.some(
+          (sub) => sub.toLowerCase() === item.subCategory?.toLowerCase(),
+        ),
       );
     }
 
@@ -165,9 +169,9 @@ const Collection = () => {
             <ProductItem
               key={item._id}
               id={item._id}
-              name={item.name}
+              title={item.title}
               price={item.price}
-              image={item.image}
+              images={item.images}
             />
           ))}
         </div>
