@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import Title from "../Title/Title";
 import ProductItem from "../ProductItem/ProductItem";
-import { AppContext } from "../../context/AppContext";
+import { AppContext } from "../../Context/AppContext";
 
 const RelatedProducts = ({ category, subCategory }) => {
   const { products } = useContext(AppContext);

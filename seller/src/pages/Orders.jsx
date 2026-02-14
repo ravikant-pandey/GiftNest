@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { assets } from "../assets/admin_assets/assets";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../Context/AppContext";
 
 const Orders = () => {
   const { backendUrl, currency, loading, orders, fetchAllOrders } =

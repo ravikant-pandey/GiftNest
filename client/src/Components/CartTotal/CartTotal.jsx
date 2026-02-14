@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import Title from "../Title/Title";
-import { AppContext } from "../../context/AppContext";
+import { AppContext } from "../../Context/AppContext";
 
 const CartTotal = () => {
   const { currency, deliveryFee, getCartAmount } = useContext(AppContext);

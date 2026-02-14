@@ -1,28 +1,28 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Collection from "./pages/Collection";
-import Orders from "./pages/Orders";
-import Login from "./pages/Login";
-import Product from "./pages/Product";
-import PlaceOrder from "./pages/PlaceOrder";
-import Cart from "./pages/Cart";
-import Footer from "./components/Footer/Footer";
+import Home from "./Pages/Home";
+import About from "./Pages/About";
+import Contact from "./Pages/Contact";
+import Collection from "./Pages/Collection";
+import Orders from "./Pages/Orders";
+import Login from "./Pages/Login";
+import Product from "./Pages/Product";
+import PlaceOrder from "./Pages/PlaceOrder";
+import Cart from "./Pages/Cart";
+import Footer from "./Components/Footer/Footer";
 
-import Birthday from "./pages/Birthday";
-import Festival from "./pages/Festival";
-import Wedding from "./pages/Wedding";
-import Flowers from "./pages/Flowers";
-import Customized from "./pages/Customized";
-import Chocolates from "./pages/Chocolates";
-import Anniversary from "./pages/Anniversary";
-import Navbar from "./components/Navbar/Navbar";
-import Profile from "./pages/Profile";
-import Plants from "./pages/Plants";
-import CustomizableProducts from "./pages/CustomizableProducts";
-import NotFound from "./pages/NotFound";
-import Verify from "./pages/Verify";
+import Birthday from "./Pages/Birthday";
+import Festival from "./Pages/Festival";
+import Wedding from "./Pages/Wedding";
+import Flowers from "./Pages/Flowers";
+import Customized from "./Pages/Customized";
+import Chocolates from "./Pages/Chocolates";
+import Anniversary from "./Pages/Anniversary";
+import Navbar from "./Components/Navbar/Navbar";
+import Profile from "./Pages/Profile";
+import Plants from "./Pages/Plants";
+import CustomizableProducts from "./Pages/CustomizableProducts";
+import NotFound from "./Pages/NotFound";
+import Verify from "./Pages/Verify";
 
 function App() {
   return (

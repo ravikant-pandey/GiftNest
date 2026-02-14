@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { AppContext } from "../context/AppContext";
-import ProductItems from "../components/ProductItems/ProductItems";
+import { AppContext } from "../Context/AppContext";
+import ProductItems from "../Components/ProductItems/ProductItems";
 
 function Wedding() {
   const { products } = useContext(AppContext);

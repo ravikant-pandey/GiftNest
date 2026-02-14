@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext } from "react";
 import { toast } from "react-hot-toast";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../Context/AppContext";
 
 const List = () => {
   const { backendUrl, currency, productList, fetchProducts } =

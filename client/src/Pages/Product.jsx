@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { assets } from "../assets/frontend_assets/assets";
-import RelatedProducts from "../components/RelatedProducts/RelatedProducts";
-import { AppContext } from "../context/AppContext";
+import RelatedProducts from "../Components/RelatedProducts/RelatedProducts";
+import { AppContext } from "../Context/AppContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 

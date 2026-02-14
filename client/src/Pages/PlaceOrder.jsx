@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
-import Title from "../components/Title/Title";
-import CartTotal from "../components/CartTotal/CartTotal";
+import Title from "../Components/Title/Title";
+import CartTotal from "../Components/CartTotal/CartTotal";
 import { assets } from "../assets/frontend_assets/assets";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../Context/AppContext";
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState("cod");

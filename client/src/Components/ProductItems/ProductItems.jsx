@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { AppContext } from "../../context/AppContext";
+import { AppContext } from "../../Context/AppContext";
 import { Link } from "react-router-dom";
 import TiltedCard from "../ui/TiltedCard";
 

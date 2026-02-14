@@ -8,7 +8,7 @@ import Orders from "./pages/Orders";
 import Login from "./components/Login";
 import { Toaster } from "react-hot-toast";
 import { Navigate } from "react-router-dom";
-import { AppContext } from "./context/AppContext";
+import { AppContext } from "./Context/AppContext";
 import Footer from "./components/Footer";
 import IsApproved from "./pages/IsApproved";
 import Dashboard from "./pages/Dashboard";

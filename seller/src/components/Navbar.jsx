@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { assets } from "../assets/admin_assets/assets";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../Context/AppContext";
 import {
   Popover,
   PopoverContent,

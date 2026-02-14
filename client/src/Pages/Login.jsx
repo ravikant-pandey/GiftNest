@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../Context/AppContext";
 import { toast } from "react-hot-toast";
 
 function Login() {

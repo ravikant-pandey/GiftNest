@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../Context/AppContext";
 
 function IsApproved() {
   const { sellerData } = useContext(AppContext);

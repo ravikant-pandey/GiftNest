@@ -1,8 +1,8 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import TiltedCard from "../components/ui/TiltedCard";
-import Title from "../components/Title/Title";
-import { AppContext } from "../context/AppContext";
+import TiltedCard from "../Components/ui/TiltedCard";
+import Title from "../Components/Title/Title";
+import { AppContext } from "../Context/AppContext";
 
 export default function CustomizableProducts() {
   const navigate = useNavigate();

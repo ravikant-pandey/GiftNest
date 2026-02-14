@@ -1,8 +1,8 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AppContext } from "../context/AppContext.jsx";
+import { AppContext } from "../Context/AppContext.jsx";
 import axios from "axios";
-import toast from "react-hot-toast"; // ✅ FIXED IMPORT
+import toast from "react-hot-toast"; 
 import { Lock, Mail, Phone, Store, User } from "lucide-react";
 
 function Login() {

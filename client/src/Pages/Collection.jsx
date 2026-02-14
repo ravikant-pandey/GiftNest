@@ -4,9 +4,9 @@ import {
   category as CATEGORY_LIST,
   subCategory as SUBCATEGORY_LIST,
 } from "../assets/frontend_assets/assets";
-import Title from "../components/Title/Title";
-import ProductItem from "../components/ProductItem/ProductItem";
-import { AppContext } from "../context/AppContext";
+import Title from "../Components/Title/Title";
+import ProductItem from "../Components/ProductItem/ProductItem";
+import { AppContext } from "../Context/AppContext";
 
 const Collection = () => {
   const { products, search, showSearch } = useContext(AppContext);

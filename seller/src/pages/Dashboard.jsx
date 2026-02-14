@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../Context/AppContext";
 import { FiDollarSign, FiShoppingBag, FiBarChart } from "react-icons/fi";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 

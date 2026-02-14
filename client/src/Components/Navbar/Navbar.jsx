@@ -1,7 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect, useContext } from "react";
 import { assets } from "../../assets/frontend_assets/assets";
-import { AppContext } from "../../context/AppContext";
+import { AppContext } from "../../Context/AppContext";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import Search from "../Search/Search";

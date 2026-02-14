@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import { FiEdit2, FiCamera, FiCheck, FiX, FiDelete } from "react-icons/fi";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../Context/AppContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 

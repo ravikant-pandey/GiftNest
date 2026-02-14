@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import Title from "../components/Title/Title";
+import Title from "../Components/Title/Title";
 import axios from "axios";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../Context/AppContext";
 
 const Orders = () => {
   const { currency, backendUrl, isLoggedIn } = useContext(AppContext);
