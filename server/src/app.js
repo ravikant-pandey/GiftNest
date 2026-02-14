@@ -21,6 +21,7 @@ app.use(
   }),
 );
 
+import { stripeWebhookHandler } from "./controllers/order.controller.js";
 app.post(
   "/api/v1/order/stripe-webhook",
   express.raw({ type: "application/json" }),

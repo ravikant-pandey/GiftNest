@@ -6,7 +6,6 @@ import {
   getOrdersForUser,
   placeOrder,
   placeOrderUsingStripe,
-  stripeWebhookHandler,
   updateOrderStatus,
 } from "../controllers/order.controller.js";
 import verifySeller from "../middleware/seller.middleware.js";
@@ -20,12 +19,5 @@ router.get("/my-orders", verifyJwt, getOrdersForUser);
 router.get("/all-orders", verifySeller, getAllOrders);
 router.put("/update-order-status", verifySeller, updateOrderStatus);
 router.get("/orders", verifyAdmin, getOrdersForAdmin);
-
-// verify payment
-router.post(
-  "/stripe-webhook",
-  express.raw({ type: "application/json" }),
-  stripeWebhookHandler,
-);
 
 export default router;
