@@ -7,7 +7,6 @@ const Orders = () => {
   const { currency, backendUrl, isLoggedIn } = useContext(AppContext);
 
   const [orderData, setOrderData] = useState([]);
-  const [amount, setAmount] = useState(0);
 
   const loadOrderData = async () => {
     try {
@@ -19,7 +18,6 @@ const Orders = () => {
         withCredentials: true,
       });
       if (data.success) {
-        setAmount(data.orders[0].amount);
         let allOrdersItem = [];
         data.orders.map((order) => {
           order.product.map((item) => {
@@ -67,7 +65,7 @@ const Orders = () => {
                 <div className="flex items-center gap-3 mt-2 text-base text-gray-700">
                   <p>
                     {currency}
-                    {amount}
+                    {item.price * item.quantity}
                   </p>
                   <p>Quantity: {item.quantity}</p>
                   {/* <p>Size: {item.size}</p> */}
