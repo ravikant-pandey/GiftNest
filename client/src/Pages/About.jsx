@@ -1,4 +1,4 @@
-import Title from "../components/Title/Title";
+import Title from "../Components/Title/Title";
 import { assets } from "../assets/frontend_assets/assets";
 import NewsLetter from "../Components/NewsLetters/NewsLetters";
 
