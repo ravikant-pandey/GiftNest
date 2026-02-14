@@ -22,6 +22,7 @@ import Profile from "./Pages/Profile";
 import Plants from "./Pages/Plants";
 import CustomizableProducts from "./Pages/CustomizableProducts";
 import NotFound from "./Pages/NotFound";
+import Verify from "./Pages/Verify";
 
 function App() {
   return (
@@ -56,6 +57,8 @@ function App() {
           {/* Profile */}
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
+
+          <Route path="/verify" element={<Verify />} />
         </Routes>
       </div>
       <Footer />

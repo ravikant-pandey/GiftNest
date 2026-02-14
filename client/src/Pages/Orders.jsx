@@ -4,30 +4,28 @@ import axios from "axios";
 import { AppContext } from "../Context/AppContext";
 
 const Orders = () => {
-  const { currency, backendUrl, token } = useContext(AppContext);
+  const { currency, backendUrl, isLoggedIn } = useContext(AppContext);
 
   const [orderData, setOrderData] = useState([]);
+  const [amount, setAmount] = useState(0);
 
   const loadOrderData = async () => {
     try {
-      if (!token) {
+      if (!isLoggedIn) {
         return null;
       }
 
-      const response = await axios.post(
-        backendUrl + "/api/order/userorders",
-        {},
-        { 
-          withCredentials:true
-        },
-      );
-      if (response.data.success) {
+      const { data } = await axios.get(backendUrl + "/order/my-orders", {
+        withCredentials: true,
+      });
+      if (data.success) {
+        setAmount(data.orders[0].amount);
         let allOrdersItem = [];
-        response.data.orders.map((order) => {
-          order.items.map((item) => {
+        data.orders.map((order) => {
+          order.product.map((item) => {
             item["status"] = order.status;
             item["payment"] = order.payment;
-            item["date"] = order.date;
+            item.date = order.createdAt;
             item["paymentMethod"] = order.paymentMethod;
             allOrdersItem.push(item);
           });
@@ -40,7 +38,16 @@ const Orders = () => {
 
   useEffect(() => {
     loadOrderData();
-  }, [token]);
+  }, [isLoggedIn]);
+
+  if (!orderData.length)
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <p className="text-gray-500 text-lg text-center">
+          No orders placed yet.
+        </p>
+      </div>
+    );
 
   return (
     <div className="border-t pt-16">
@@ -54,13 +61,13 @@ const Orders = () => {
             className="py-4 border-t border-b text-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
           >
             <div className="flex items-start gap-6 text-sm">
-              <img className="w-16 sm:w-20" src={item.image[0]} alt="" />
+              <img className="w-16 sm:w-20" src={item.images[0]} alt="" />
               <div>
-                <p className="sm:text-base font-medium">{item.name}</p>
+                <p className="sm:text-base font-medium">{item.title}</p>
                 <div className="flex items-center gap-3 mt-2 text-base text-gray-700">
                   <p>
                     {currency}
-                    {item.price}
+                    {amount}
                   </p>
                   <p>Quantity: {item.quantity}</p>
                   {/* <p>Size: {item.size}</p> */}

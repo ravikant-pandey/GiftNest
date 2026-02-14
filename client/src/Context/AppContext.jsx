@@ -166,7 +166,6 @@ const AppContextProvider = (props) => {
   const value = {
     products,
     currency,
-    delivery_fees,
     backendUrl,
 
     // user

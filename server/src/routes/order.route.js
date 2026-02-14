@@ -2,12 +2,15 @@ import express from "express";
 import verifyJwt from "../middleware/auth.middleware.js";
 import {
   getAllOrders,
+  getOrdersForAdmin,
   getOrdersForUser,
   placeOrder,
   placeOrderUsingStripe,
+  stripeWebhookHandler,
   updateOrderStatus,
 } from "../controllers/order.controller.js";
 import verifySeller from "../middleware/seller.middleware.js";
+import verifyAdmin from "../middleware/admin.middleware.js";
 
 const router = express.Router();
 
@@ -16,5 +19,13 @@ router.post("/place-order-stripe", verifyJwt, placeOrderUsingStripe);
 router.get("/my-orders", verifyJwt, getOrdersForUser);
 router.get("/all-orders", verifySeller, getAllOrders);
 router.put("/update-order-status", verifySeller, updateOrderStatus);
+router.get("/orders", verifyAdmin, getOrdersForAdmin);
+
+// verify payment
+router.post(
+  "/stripe-webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebhookHandler,
+);
 
 export default router;
