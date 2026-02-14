@@ -1,12 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
-import {
-  FiDollarSign,
-  FiShoppingBag,
-  
-  FiBarChart,
-} from "react-icons/fi";
+import { FiDollarSign, FiShoppingBag, FiBarChart } from "react-icons/fi";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 
 import { assets } from "../assets/admin_assets/assets";
@@ -16,8 +11,14 @@ import toast from "react-hot-toast";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { productList, sellerData, currency, backendUrl, fetchProducts } =
-    useContext(AppContext);
+  const {
+    productList,
+    sellerData,
+    currency,
+    backendUrl,
+    fetchProducts,
+    orders,
+  } = useContext(AppContext);
 
   // EDIT MODAL STATES
   const [isEditing, setIsEditing] = useState(false);
@@ -81,9 +82,20 @@ const Dashboard = () => {
     }
   };
 
+  const revenue = orders
+    .filter((o) => o.isPaid === true)
+    .reduce((sum, o) => sum + o.amount, 0);
+
   const vendorData = {
-    totalSales: 45890.75,
-    totalOrders: 167,
+    totalOrders: orders.length,
+    totalSales: revenue,
+    totalProducts: productList.length,
+    avgOrder:
+      orders.length > 0
+        ? (
+            orders.reduce((acc, order) => acc + order.amount, 0) / orders.length
+          ).toFixed(2)
+        : 0,
   };
 
   const StatCard = ({ icon: Icon, title, value }) => (
@@ -125,20 +137,22 @@ const Dashboard = () => {
           <StatCard
             icon={FiDollarSign}
             title="Total Revenue"
-            value={`${currency}${vendorData.totalSales}`}
+            value={`${currency}${vendorData.totalSales.toFixed(2)}`}
           />
           <StatCard
             icon={MdOutlineProductionQuantityLimits}
             title="Total Orders"
             value={vendorData.totalOrders}
           />
-          <StatCard icon={FiShoppingBag} title="Total Product" value="124" />
+          <StatCard
+            icon={FiShoppingBag}
+            title="Total Product"
+            value={vendorData.totalProducts}
+          />
           <StatCard
             icon={FiBarChart}
             title="Average Order"
-            value={`${currency}${(
-              vendorData.totalSales / vendorData.totalOrders
-            ).toFixed(2)}`}
+            value={`${currency}${vendorData.avgOrder}`}
           />
         </div>
 

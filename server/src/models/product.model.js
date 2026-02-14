@@ -45,7 +45,6 @@ const productSchema = new Schema(
     },
 
     seller: {
-      // ⭐ fixed typo
       type: mongoose.Schema.Types.ObjectId,
       ref: "Seller",
       required: true,

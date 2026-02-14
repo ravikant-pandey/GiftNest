@@ -20,28 +20,86 @@ import {
   ChartNoAxesCombined,
   ChartPie,
 } from "lucide-react";
+import dayjs from "dayjs";
+
+/* ---------- HELPERS ---------- */
+
+// Last 7 days sales
+const generateLast7DaysData = (orders) => {
+  const last7Days = [];
+
+  for (let i = 6; i >= 0; i--) {
+    const date = dayjs().subtract(i, "day");
+    const dayName = date.format("ddd");
+
+    const daySales = orders
+      .filter(
+        (order) =>
+          dayjs(order.createdAt).isSame(date, "day") && order.isPaid === true,
+      )
+      .reduce((sum, order) => sum + order.amount, 0);
+
+    last7Days.push({
+      day: dayName,
+      sales: daySales,
+    });
+  }
+
+  return last7Days;
+};
+
+// Monthly revenue from real orders
+const generateMonthlyRevenue = (orders) => {
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  return months.map((month, index) => {
+    const monthRevenue = orders
+      .filter((o) => dayjs(o.createdAt).month() === index && o.isPaid === true)
+      .reduce((sum, o) => sum + o.amount, 0);
+
+    return { month, revenue: monthRevenue };
+  });
+};
+
+/* ---------- MAIN DASHBOARD ---------- */
 
 const Dashboard = () => {
-  const { isAdminLoggedIn } = useContext(AppContext);
+  const { isAdminLoggedIn, products, orders, sellers } = useContext(AppContext);
   const [dashData, setDashData] = useState(null);
 
   useEffect(() => {
     if (isAdminLoggedIn) {
+      const revenue = orders
+        .filter((o) => o.isPaid === true)
+        .reduce((sum, o) => sum + o.amount, 0);
+
       setDashData({
-        products: 12,
-        orders: 6,
-        customers: 97,
-        revenue: 959.1,
-        stores: 2,
+        products: products.length,
+        orders: orders.length,
+        revenue,
+        stores: sellers.length,
       });
     }
-  }, [isAdminLoggedIn]);
+  }, [isAdminLoggedIn, products, orders, sellers]);
 
   if (!dashData) return null;
 
   return (
     <div className="m-5 space-y-8">
-      {/* ========= TOP STATS ========= */}
+      {/* TOP STATS */}
       <div className="flex flex-wrap gap-4">
         <StatCard
           icon={assets.product_icon}
@@ -50,7 +108,7 @@ const Dashboard = () => {
         />
         <StatCard
           icon={assets.revenue_icon}
-          value={`$${dashData.revenue}`}
+          value={`₹ ${dashData.revenue}`}
           label="Total Revenue"
         />
         <StatCard
@@ -65,19 +123,19 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* ========= CHARTS ROW ========= */}
+      {/* CHARTS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Last7DaysSales />
-        <OrderCancelRatio />
+        <Last7DaysSales orders={orders} />
+        <OrderCancelRatio orders={orders} />
       </div>
 
-      {/* ========= MONTHLY REVENUE ========= */}
-      <MonthlyRevenue />
+      <MonthlyRevenue orders={orders} />
     </div>
   );
 };
 
-/*  STAT CARD  */
+/* ---------- STAT CARD ---------- */
+
 const StatCard = ({ icon, value, label }) => (
   <div className="flex items-center gap-3 bg-white p-4 min-w-52 rounded border hover:scale-105 transition-all">
     <img className="w-14" src={icon} alt="" />
@@ -88,17 +146,10 @@ const StatCard = ({ icon, value, label }) => (
   </div>
 );
 
-/*  LAST 7 DAYS SALES  */
-const Last7DaysSales = () => {
-  const data = [
-    { day: "Mon", sales: 120 },
-    { day: "Tue", sales: 210 },
-    { day: "Wed", sales: 150 },
-    { day: "Thu", sales: 300 },
-    { day: "Fri", sales: 250 },
-    { day: "Sat", sales: 400 },
-    { day: "Sun", sales: 350 },
-  ];
+/* ---------- LAST 7 DAYS SALES ---------- */
+
+const Last7DaysSales = ({ orders }) => {
+  const data = generateLast7DaysData(orders);
 
   return (
     <div className="bg-white p-5 rounded border">
@@ -106,6 +157,7 @@ const Last7DaysSales = () => {
         <ChartNoAxesCombined />
         <span>Last 7 Days Sales</span>
       </div>
+
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -119,12 +171,17 @@ const Last7DaysSales = () => {
   );
 };
 
-/*  ORDER VS CANCEL  */
-const OrderCancelRatio = () => {
+/* ---------- ORDER VS CANCEL PIE ---------- */
+
+const OrderCancelRatio = ({ orders }) => {
+  const completed = orders.filter((o) => o.status === "Delivered").length;
+  const cancelled = orders.filter((o) => o.status === "Cancelled").length;
+
   const data = [
-    { name: "Completed", value: 80 },
-    { name: "Cancelled", value: 20 },
+    { name: "Completed", value: completed },
+    { name: "Cancelled", value: cancelled },
   ];
+
   const COLORS = ["#22c55e", "#ef4444"];
 
   return (
@@ -141,8 +198,8 @@ const OrderCancelRatio = () => {
           dataKey="value"
           label
         >
-          {data.map((_, index) => (
-            <Cell key={index} fill={COLORS[index]} />
+          {data.map((_, i) => (
+            <Cell key={i} fill={COLORS[i]} />
           ))}
         </Pie>
         <Tooltip />
@@ -151,21 +208,17 @@ const OrderCancelRatio = () => {
   );
 };
 
-/*  MONTHLY REVENUE  */
-const MonthlyRevenue = () => {
-  const data = [
-    { month: "Jan", revenue: 1200 },
-    { month: "Feb", revenue: 2100 },
-    { month: "Mar", revenue: 1800 },
-    { month: "Apr", revenue: 2500 },
-    { month: "May", revenue: 3200 },
-  ];
+/* ---------- MONTHLY REVENUE ---------- */
+
+const MonthlyRevenue = ({ orders }) => {
+  const data = generateMonthlyRevenue(orders);
 
   return (
     <div className="bg-white p-5 rounded border">
       <div className="font-medium mb-4 gap-2 flex">
         <ChartNoAxesColumnIncreasing /> <span>Monthly Revenue</span>
       </div>
+
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
           <XAxis dataKey="month" />

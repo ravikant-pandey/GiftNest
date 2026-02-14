@@ -5,31 +5,8 @@ import { assets } from "../assets/admin_assets/assets";
 import { AppContext } from "../context/AppContext";
 
 const Orders = () => {
-  const { backendUrl, currency, sellerLoggedIn } = useContext(AppContext);
-
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetchAllOrders = async () => {
-    if (!sellerLoggedIn) return;
-
-    try {
-      setLoading(true);
-      const { data } = await axios.get(`${backendUrl}/order/all-orders`, {
-        withCredentials: true,
-      });
-
-      if (data.success) {
-        setOrders(data.orders);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { backendUrl, currency, loading, orders, fetchAllOrders } =
+    useContext(AppContext);
 
   const statusHandler = async (event, orderId) => {
     const newStatus = event.target.value;
@@ -51,10 +28,6 @@ const Orders = () => {
       toast.error(error.response?.data?.message || error.message);
     }
   };
-
-  useEffect(() => {
-    fetchAllOrders();
-  }, [sellerLoggedIn]);
 
   const statusColor = {
     "Order Placed": "text-yellow-600",
@@ -141,6 +114,7 @@ const Orders = () => {
                   <option value="Shipped">Shipped</option>
                   <option value="Out For Delivery">Out For Delivery</option>
                   <option value="Delivered">Delivered</option>
+                  <option value="Cancelled">Cancelled</option>
                 </select>
               </div>
             </div>

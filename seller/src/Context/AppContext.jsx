@@ -11,8 +11,9 @@ const AppContextProvider = (props) => {
     localStorage.getItem("sellerLoggedIn") === "true",
   );
   const [productList, setProductList] = useState([]);
-
   const [sellerData, setSellerData] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   //  SELLER
   const getSellerData = async () => {
@@ -52,6 +53,34 @@ const AppContextProvider = (props) => {
     }
   };
 
+  const fetchAllOrders = async () => {
+    if (!sellerLoggedIn) return;
+
+    try {
+      setLoading(true);
+      const { data } = await axios.get(`${backendUrl}/order/all-orders`, {
+        withCredentials: true,
+      });
+
+      if (data.success) {
+        setOrders(data.orders);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //  auto-fetch products when token changes (refresh login)
+  useEffect(() => {
+    if (sellerLoggedIn) {
+      fetchAllOrders();
+    }
+  }, [sellerLoggedIn]);
+
   useEffect(() => {
     if (sellerLoggedIn) {
       fetchProducts();
@@ -81,6 +110,12 @@ const AppContextProvider = (props) => {
     productList,
     setProductList,
     fetchProducts,
+    loading,
+
+    // order
+    orders,
+    setOrders,
+    fetchAllOrders,
   };
 
   return (

@@ -11,6 +11,8 @@ const AppContextProvider = ({ children }) => {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [sellers, setSellers] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   // Fetch Admin Session
   const fetchAdminData = async () => {
@@ -47,6 +49,39 @@ const AppContextProvider = ({ children }) => {
     }
   };
 
+  const fetchProductData = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/product/products`, {
+        withCredentials: true,
+      });
+      if (data.success) {
+        setProducts(data.products);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  };
+  const fetchOrderData = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/order/orders`, {
+        withCredentials: true,
+      });
+      if (data.success) {
+        setOrders(data.orders);
+      }
+    } catch (error) {}
+  };
+
+  // automatically fetch
+  useEffect(() => {
+    if (isAdminLoggedIn) {
+      fetchProductData();
+      fetchOrderData();
+    }
+  }, [isAdminLoggedIn]);
+
+  // Fetch Seller Session
+
   useEffect(() => {
     if (isAdminLoggedIn) {
       fetchSellerData();
@@ -74,6 +109,12 @@ const AppContextProvider = ({ children }) => {
     sellers,
     setSellers,
     fetchSellerData,
+    products,
+    setProducts,
+    fetchProductData,
+    orders,
+    setOrders,
+    fetchOrderData,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

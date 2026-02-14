@@ -167,7 +167,27 @@ const getAllOrders = asyncHandler(async (req, res) => {
 const updateOrderStatus = asyncHandler(async (req, res) => {
   try {
     const { orderId, status } = req.body;
-    await Order.findByIdAndUpdate(orderId, { $set: { status } }, { new: true });
+
+    // 1️⃣ find order first
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // 2️⃣ update order status
+    order.status = status;
+    await order.save();
+
+    // 3️⃣ when delivered → mark CUSTOMER as paid
+    if (status === "delivered") {
+      await User.findByIdAndUpdate(order.userId, {
+        $set: { isPaid: true },
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: `Order ${status} successfully`,
@@ -183,7 +203,21 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
 // get orders for admin
 const getOrdersForAdmin = asyncHandler(async (req, res) => {
-  const orders = await Order.find().sort({ createdAt: -1 });
+  const orders = await Order.find()
+    .populate({
+      path: "user",
+      select: "-password",
+    })
+    .populate({
+      path: "product",
+      populate: {
+        path: "seller",
+        model: "Seller", 
+        select: "store",
+      },
+    })
+    .sort({ createdAt: -1 });
+
   return res.status(200).json({
     success: true,
     orders,

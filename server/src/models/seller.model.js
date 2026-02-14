@@ -54,11 +54,6 @@ const sellerSchema = new Schema(
       type: Boolean,
       default: true,
     },
-
-    earnings: {
-      type: Number,
-      default: 0,
-    },
   },
   {
     timestamps: true,
