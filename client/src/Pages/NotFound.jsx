@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import VariableProximity from "../Components/ui/VariableProximity";
+import VariableProximity from "../components/ui/VariableProximity";
 import { useRef } from "react";
-import Title from "../Components/Title/Title";
+import Title from "../components/Title/Title";
 
 function NotFound() {
   const containerRef = useRef(null);

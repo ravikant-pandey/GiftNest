@@ -2,7 +2,7 @@ import { Stage, Layer, Image, Text, Transformer } from "react-konva";
 import { useEffect, useRef, useState, useContext } from "react";
 import useImage from "use-image";
 import { useParams } from "react-router-dom";
-import Title from "../Components/Title/Title";
+import Title from "../components/Title/Title";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-hot-toast";
 

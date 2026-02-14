@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { AppContext } from "../../Context/AppContext";
+import { AppContext } from "../../context/AppContext";
 import TiltedCard from "../ui/TiltedCard";
 
 const ProductItem = ({ id, images, title, price }) => {

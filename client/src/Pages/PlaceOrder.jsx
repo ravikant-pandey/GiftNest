@@ -4,7 +4,7 @@ import CartTotal from "../components/CartTotal/CartTotal";
 import { assets } from "../assets/frontend_assets/assets";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { AppContext } from "../Context/AppContext";
+import { AppContext } from "../context/AppContext";
 
 const PlaceOrder = () => {
   const [method, setMethod] = useState("cod");

@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import Title from "../Title/Title";
-import { AppContext } from "../../Context/AppContext";
+import { AppContext } from "../../context/AppContext";
 
 const CartTotal = () => {
   const { currency, deliveryFee, getCartAmount } = useContext(AppContext);
@@ -39,7 +39,7 @@ const CartTotal = () => {
                 {currency}
                 {deliveryFee}
               </span>
-              FREE 
+              FREE
             </p>
           ) : (
             <p className="text-red-500 font-medium">

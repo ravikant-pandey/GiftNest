@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
-import ProductItems from "../Components/ProductItems/ProductItems";
+import ProductItems from "../components/ProductItems/ProductItems";
 
 function Festival() {
   const { products } = useContext(AppContext);

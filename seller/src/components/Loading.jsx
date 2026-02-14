@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 
 const LoadingAnimation = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [ setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const darkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");

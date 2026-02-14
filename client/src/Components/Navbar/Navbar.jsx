@@ -1,7 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect, useContext } from "react";
 import { assets } from "../../assets/frontend_assets/assets";
-import { AppContext } from "../../Context/AppContext";
+import { AppContext } from "../../context/AppContext";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import Search from "../Search/Search";
@@ -177,7 +177,7 @@ function Navbar() {
               {openMoreDropdown && (
                 <div className="absolute mt-3 right-0 bg-white shadow-md rounded border w-[220px] p-2 text-sm z-50">
                   <a
-                    href="http://localhost:5174"
+                    href="https://admin-giftnest.vercel.app"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -189,7 +189,7 @@ function Navbar() {
                     </p>
                   </a>
                   <a
-                    href="http://localhost:5175"
+                    href="https://seller-giftnest.vercel.app"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -266,7 +266,7 @@ function Navbar() {
               Admin
             </NavLink>
             <a
-              href="http://localhost:5174"
+              href="https://admin-giftnest.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
             >

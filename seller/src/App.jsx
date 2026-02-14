@@ -17,22 +17,19 @@ import LoadingAnimation from "./components/Loading";
 const App = () => {
   const { sellerLoggedIn, sellerData } = useContext(AppContext);
 
-  // 1️⃣ Jab login hi nahi hua
   if (!sellerLoggedIn) {
     return <Login />;
   }
 
-  // 2️⃣ Jab data abhi load ho raha hai
   if (!sellerData) {
     return <LoadingAnimation />;
   }
 
-  // 3️⃣ Jab seller approve nahi hai
   if (sellerData.status === "pending" || sellerData.status === "rejected") {
     return <IsApproved />;
   }
 
-  // 4️⃣ Normal app
+  // Normal app
   return (
     <div className="bg-gray-50 min-h-screen">
       <Toaster />

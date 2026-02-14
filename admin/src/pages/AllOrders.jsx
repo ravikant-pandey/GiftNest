@@ -9,7 +9,7 @@ const AllOrders = () => {
     if (!isAdminLoggedIn || !orders?.length) return;
 
     const data = orders.map((odr) => {
-      const product = odr.product?.[0]; 
+      const product = odr.product?.[0];
 
       return {
         id: odr._id,
@@ -29,7 +29,6 @@ const AllOrders = () => {
 
     setFormattedOrders(data);
   }, [isAdminLoggedIn, orders]);
-
 
   const formatDate = (date) => new Date(date).toLocaleDateString("en-IN");
 

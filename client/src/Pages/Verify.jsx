@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { FaCheckCircle, FaTimesCircle, FaCreditCard } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 import { useSearchParams } from "react-router-dom";
-import { AppContext } from "../Context/AppContext";
+import { AppContext } from "../context/AppContext";
 
 const Verify = () => {
   const { navigate, setCartItems } = useContext(AppContext);

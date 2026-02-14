@@ -6,7 +6,7 @@ import {
 } from "../assets/frontend_assets/assets";
 import Title from "../components/Title/Title";
 import ProductItem from "../components/ProductItem/ProductItem";
-import { AppContext } from "../Context/AppContext";
+import { AppContext } from "../context/AppContext";
 
 const Collection = () => {
   const { products, search, showSearch } = useContext(AppContext);
