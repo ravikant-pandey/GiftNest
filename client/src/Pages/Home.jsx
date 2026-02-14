@@ -1,10 +1,10 @@
-import BestSeller from "../components/BestSeller/BestSeller";
-import Categories from "../components/Categories/Categories";
-import Hero from "../components/Hero/Hero";
-import LatestCollections from "../components/LatestCollections/LatestCollections";
+import BestSeller from "../Components/BestSeller/BestSeller";
+import Categories from "../Components/Categories/Categories";
+import Hero from "../Components/Hero/Hero";
+import LatestCollections from "../Components/LatestCollections/LatestCollections";
 import NewsLetters from "../Components/NewsLetters/NewsLetters";
-import OurPolicy from "../components/OurPolicy/OurPolicy";
-import Search from "../components/Search/Search";
+import OurPolicy from "../Components/OurPolicy/OurPolicy";
+import Search from "../Components/Search/Search";
 import { useContext } from "react";
 import { AppContext } from "../Context/AppContext";
 function Home() {
