@@ -182,7 +182,6 @@ function Navbar() {
                     rel="noopener noreferrer"
                   >
                     <p
-                      onClick={() => navigate("/admin")}
                       className="cursor-pointer hover:bg-gray-100 p-2"
                     >
                       Admin
@@ -258,15 +257,15 @@ function Navbar() {
             >
               My Profile
             </NavLink>
-            <NavLink
-              to="/admin"
-              onClick={() => setVisible(false)}
-              className="p-4 border-b hover:bg-gray-100"
-            >
-              Admin
-            </NavLink>
             <a
               href="https://admin-giftnest.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <p className="cursor-pointer hover:bg-gray-100 p-2">Admin</p>
+            </a>
+            <a
+              href="https://seller-giftnest.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
             >
