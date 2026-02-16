@@ -2,6 +2,7 @@ import { uploadOnCloudinary } from "../config/cloudinary.js";
 import { Order } from "../models/order.model.js";
 import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { Product } from "../models/product.model.js";
 import Stripe from "stripe";
 
 // gateway initialize
@@ -149,14 +150,13 @@ const placeOrderUsingStripe = asyncHandler(async (req, res) => {
   }
 });
 
-
 // get orders for logged in user
 const getOrdersForUser = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
   const orders = await Order.find({ user: userId })
     .populate({
-      path: "product.productId", 
+      path: "product.productId",
       model: "Product",
       select: "title amount images price",
     })
@@ -167,7 +167,6 @@ const getOrdersForUser = asyncHandler(async (req, res) => {
     orders,
   });
 });
-
 
 const getAllOrders = asyncHandler(async (req, res) => {
   try {
@@ -207,7 +206,6 @@ const getAllOrders = asyncHandler(async (req, res) => {
   }
 });
 
-
 // update order status from seller panel
 const updateOrderStatus = asyncHandler(async (req, res) => {
   try {
@@ -242,7 +240,6 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     });
   }
 });
-
 
 // get orders for admin
 const getOrdersForAdmin = asyncHandler(async (req, res) => {
