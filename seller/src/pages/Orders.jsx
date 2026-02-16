@@ -20,7 +20,7 @@ const Orders = () => {
 
       if (data.success) {
         toast.success("Order status updated");
-        fetchAllOrders(); // refresh orders
+        fetchAllOrders();
       } else {
         toast.error(data.message);
       }
@@ -35,6 +35,7 @@ const Orders = () => {
     Shipped: "text-purple-600",
     "Out For Delivery": "text-orange-600",
     Delivered: "text-green-600",
+    Cancelled: "text-red-600",
   };
 
   if (loading) {
@@ -51,74 +52,76 @@ const Orders = () => {
         <div>
           <h3 className="text-xl font-semibold mb-4">Order Page</h3>
 
-          {orders.map((order) => (
-            <div
-              key={order._id}
-              className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-gray-200 p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-gray-700"
-            >
-              {/* Image */}
-              <img
-                className="w-12"
-                src={order.product[0].images[0] || assets.parcel_icon}
-                alt="parcel"
-              />
+          {orders.map((order) => {
+            const totalPrice = (order.product?.price || 0) * order.quantity;
 
-              {/* Items + Address */}
-              <div>
+            return (
+              <div
+                key={order._id}
+                className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-gray-200 p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-gray-700"
+              >
+                {/* Product Image */}
+                <img
+                  className="w-12"
+                  src={order.product?.images?.[0] || assets.parcel_icon}
+                  alt="parcel"
+                />
+
+                {/* Product + Customer */}
                 <div>
-                  {(order.items || order.product || []).map((item, index) => (
-                    <p key={index} className="py-0.5">
-                      {item.name} x {item.quantity}
-                    </p>
-                  ))}
+                  <p className="font-medium text-sm md:text-base">
+                    {order.product?.title}
+                  </p>
+
+                  <p className="mt-2">
+                    Quantity: <b>{order.quantity}</b>
+                  </p>
+
+                  <p className="mt-2">
+                    Customer: <b>{order.customer}</b>
+                  </p>
+
+                  <p className="mt-2 text-gray-500">
+                    {order.date.split("T")[0]}
+                  </p>
                 </div>
 
-                <p className="mt-3 mb-2 font-medium">
-                  {order.address.firstName} {order.address.lastName}
+                {/* Payment Info */}
+                <div>
+                  <p>Method: {order.paymentMethod}</p>
+                  <p className="mt-2">
+                    Payment: {order.isPaid ? "Done" : "Pending"}
+                  </p>
+                </div>
+
+                {/* Amount */}
+                <p className="text-sm sm:text-[15px] font-semibold">
+                  {currency} {totalPrice}
                 </p>
 
-                <p>{order.address.street}</p>
-                <p>
-                  {order.address.city}, {order.address.state},{" "}
-                  {order.address.country}, {order.address.zipcode}
-                </p>
-                <p>{order.address.phone}</p>
-              </div>
+                {/* Status */}
+                <div>
+                  <p className={`font-bold mb-2 ${statusColor[order.status]}`}>
+                    {order.status}
+                  </p>
 
-              {/* Order Info */}
-              <div>
-                <p>Items: {order.product.length}</p>
-                <p className="mt-2">Method: {order.paymentMethod}</p>
-                <p>Payment: {order.isPaid ? "Done" : "Pending"}</p>
-                <p>Date: {order.createdAt.split("T")[0]}</p>
+                  <select
+                    onChange={(e) => statusHandler(e, order.orderId)}
+                    value={order.status}
+                    className="p-2 border rounded"
+                    disabled={order.status === "Delivered"}
+                  >
+                    <option value="Order Placed">Order Placed</option>
+                    <option value="Packing">Packing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Out For Delivery">Out For Delivery</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
               </div>
-
-              {/* Amount */}
-              <p className="text-sm sm:text-[15px] font-semibold">
-                {currency} {order.amount}
-              </p>
-
-              {/* Status */}
-              <div>
-                <p className={`font-bold mb-2 ${statusColor[order.status]}`}>
-                  {order.status}
-                </p>
-                <select
-                  onChange={(e) => statusHandler(e, order._id)}
-                  value={order.status}
-                  className="p-2 border rounded"
-                  disabled={order.status === "Delivered"}
-                >
-                  <option value="Order Placed">Order Placed</option>
-                  <option value="Packing">Packing</option>
-                  <option value="Shipped">Shipped</option>
-                  <option value="Out For Delivery">Out For Delivery</option>
-                  <option value="Delivered">Delivered</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="p-6 text-center text-gray-500">

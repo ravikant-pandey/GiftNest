@@ -8,10 +8,24 @@ const orderSchema = new Schema(
       required: true,
     },
 
-    product: {
-      type: Array, // direct array store
-      required: true,
-    },
+    product: [
+      {
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+
+        quantity: {
+          type: Number,
+          required: true,
+          default: 1,
+        },
+
+        customeText: String,
+        customeImage: String,
+      },
+    ],
 
     amount: {
       type: Number,
@@ -19,7 +33,7 @@ const orderSchema = new Schema(
     },
 
     address: {
-      type: Object, // full address object
+      type: Object,
       required: true,
     },
 

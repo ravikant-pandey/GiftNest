@@ -21,7 +21,6 @@ export default function GiftEditor() {
 
   const productData = products.find((p) => p._id == id);
 
-  // ⭐ FIX 1 — images instead of image
   const [baseImage] = useImage(productData?.images?.[0]);
 
   const [userImageURL, setUserImageURL] = useState(null);

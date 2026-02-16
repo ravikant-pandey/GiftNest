@@ -10,21 +10,23 @@ const Cart = () => {
 
   const [cartData, setCartData] = useState([]);
 
-  //  convert cart object → array
+  // Convert cart array → UI usable data
   useEffect(() => {
-    if (products.length > 0) {
-      const tempData = [];
+    if (products.length > 0 && cartItems.length > 0) {
+      const tempData = cartItems.map((item) => {
+        const productData = products.find(
+          (product) => product._id === item.productId,
+        );
 
-      for (const itemId in cartItems) {
-        if (cartItems[itemId] > 0) {
-          tempData.push({
-            _id: itemId,
-            quantity: cartItems[itemId],
-          });
-        }
-      }
+        if (!productData) return null;
 
-      setCartData(tempData);
+        return {
+          ...item,
+          productData,
+        };
+      });
+
+      setCartData(tempData.filter(Boolean));
     }
   }, [cartItems, products]);
 
@@ -36,36 +38,52 @@ const Cart = () => {
 
       <div>
         {cartData.map((item, index) => {
-          const productData = products.find(
-            (product) => product._id === item._id,
-          );
-
-          if (!productData) return null;
+          const { productData } = item;
 
           return (
             <div
-              key={index}
-              className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
+              key={item._id}
+              className="py-4 border-t border-b text-gray-700 grid grid-cols-[4fr_1fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr] items-center gap-4"
             >
               {/* Product Info */}
               <div className="flex items-start gap-6">
-                <img className="w-16 sm:w-20" src={productData.images[0]} />
+                <img
+                  className="w-16 sm:w-20"
+                  src={productData.images[0]}
+                  alt={productData.title}
+                />
+
                 <div>
                   <p className="text-xs sm:text-lg font-medium">
                     {productData.title}
                   </p>
-                  <div className="flex items-center gap-5 mt-2">
-                    <p>
-                      {currency}
-                      {productData.price}
+
+                  <p className="mt-1">
+                    {currency}
+                    {productData.price}
+                  </p>
+
+                  {/* Show Custom Text */}
+                  {item.customeText && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Custom Text: {item.customeText}
                     </p>
-                  </div>
+                  )}
+
+                  {/* Show Custom Image */}
+                  {item.customeImage && (
+                    <img
+                      src={item.customeImage}
+                      alt="Custom"
+                      className="w-14 mt-2 border rounded"
+                    />
+                  )}
                 </div>
               </div>
 
               {/* Quantity */}
               <input
-                className="border max-w-10 sm:max-w-20 px-1 sm:px-2 py-1"
+                className="border max-w-12 px-2 py-1"
                 type="number"
                 min={1}
                 value={item.quantity}
@@ -78,9 +96,9 @@ const Cart = () => {
 
               {/* Delete */}
               <img
-                className="w-4 mr-4 sm:w-5 cursor-pointer"
+                className="w-4 sm:w-5 cursor-pointer"
                 src={assets.bin_icon}
-                alt="bin_icon"
+                alt="delete"
                 onClick={() => updateQuantity(item._id, 0)}
               />
             </div>
@@ -95,7 +113,7 @@ const Cart = () => {
           <div className="w-full text-end">
             <button
               onClick={() => navigate("/place-order")}
-              className="bg-black text-white text-sm my-8 px-8 py-3 cursor-pointer active:bg-gray-700 rounded-2xl"
+              className="bg-black text-white text-sm my-8 px-8 py-3 rounded-2xl"
             >
               PROCEED TO CHECKOUT
             </button>

@@ -3,109 +3,86 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 // add product to user cart
 const addToCart = asyncHandler(async (req, res) => {
-  try {
-    const { productId } = req.body;
-    const userId = req.user._id;
+  const { productId, customeText, customeImage } = req.body;
+  const userId = req.user._id;
 
-    // 1️⃣ Find user
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    // 2️⃣ Initialize cart if not exists
-    if (!user.cart) {
-      user.cart = {};
-    }
-
-    // 3️⃣ Add / increase quantity
-    if (user.cart[productId]) {
-      user.cart[productId] += 1;
-    } else {
-      user.cart[productId] = 1;
-    }
-
-    // 4️⃣ Important for nested object updates
-    user.markModified("cart");
-
-    // 5️⃣ Save user
-    await user.save();
-
-    // 6️⃣ Send response
-    res.status(200).json({
-      success: true,
-      message: "Product added to cart",
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(400).json({
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({
       success: false,
-      message: error.message,
+      message: "User not found",
     });
   }
+
+  // Check if same product + same customization already exists
+  const existingItem = user.cart.find(
+    (item) =>
+      item.productId.toString() === productId &&
+      item.customeText === customeText &&
+      item.customeImage === customeImage,
+  );
+
+  if (existingItem) {
+    existingItem.quantity += 1;
+  } else {
+    user.cart.push({
+      productId,
+      quantity: 1,
+      customeText: customeText || "",
+      customeImage: customeImage || "",
+    });
+  }
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Product added to cart",
+    cart: user.cart,
+  });
 });
 
-// update cart quantity
+
 const updateCart = asyncHandler(async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const { productId, quantity } = req.body;
+  const { cartItemId, quantity } = req.body;
+  const userId = req.user._id;
 
-    // 1️⃣ Validate quantity
-    if (quantity < 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Quantity cannot be negative",
-      });
-    }
-
-    // 2️⃣ Find user
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    // 3️⃣ Ensure cart exists
-    if (!user.cart) {
-      user.cart = {};
-    }
-
-    // 4️⃣ If quantity = 0 → remove item
-    if (quantity === 0) {
-      delete user.cart[productId];
-    } else {
-      // 5️⃣ Update quantity
-      user.cart[productId] = quantity;
-    }
-
-    // 6️⃣ Tell mongoose cart changed
-    user.markModified("cart");
-
-    // 7️⃣ Save
-    await user.save();
-
-    // 8️⃣ Response
-    res.status(200).json({
-      success: true,
-      message: "Cart updated",
-      cart: user.cart,
-    });
-  } catch (error) {
-    console.log(error);
+  if (quantity < 0) {
     return res.status(400).json({
       success: false,
-      message: error.message,
+      message: "Quantity cannot be negative",
     });
   }
+
+  const user = await User.findById(userId);
+
+  const item = user.cart.id(cartItemId);
+
+  if (!item) {
+    return res.status(404).json({
+      success: false,
+      message: "Cart item not found",
+    });
+  }
+
+  if (quantity === 0) {
+    item.remove();
+  } else {
+    item.quantity = quantity;
+  }
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Cart updated",
+    cart: user.cart,
+  });
 });
 
-// gat cart data for particular user
+
+
+// get cart data for particular user
 const getCartData = asyncHandler(async (req, res) => {
   try {
     const userId = req.user._id;

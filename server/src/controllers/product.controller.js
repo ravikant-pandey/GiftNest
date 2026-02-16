@@ -5,13 +5,26 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 // get all products
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await Product.find();
-    return res.status(200).json({ success: true, products });
+    const products = await Product.find().populate({
+      path: "seller",
+      match: { isActive: true }, // only active sellers
+    });
+
+    // populate match se inactive sellers null ho jate hain
+    const filteredProducts = products.filter((p) => p.seller != null);
+
+    return res.status(200).json({
+      success: true,
+      products: filteredProducts,
+    });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 });
+
 
 // create product
 const createProduct = asyncHandler(async (req, res) => {

@@ -1,3 +1,4 @@
+import { uploadOnCloudinary } from "../config/cloudinary.js";
 import { Order } from "../models/order.model.js";
 import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -6,20 +7,31 @@ import Stripe from "stripe";
 // gateway initialize
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Placing order using COD method
+// place order
 const placeOrder = asyncHandler(async (req, res) => {
   try {
     const userId = req.user._id;
     const { product, amount, address } = req.body;
+
+    if (!product || product.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No products provided",
+      });
+    }
+
     const order = await Order.create({
       user: userId,
-      product,
+      product, // already contains quantity + custom fields
       amount,
       address,
       paymentMethod: "COD",
     });
 
-    await User.findByIdAndUpdate(userId, { $set: { cart: {} } });
+    // Clear cart
+    await User.findByIdAndUpdate(userId, {
+      $set: { cart: [] },
+    });
 
     res.status(201).json({
       success: true,
@@ -41,41 +53,51 @@ const placeOrderUsingStripe = asyncHandler(async (req, res) => {
     const userId = req.user._id;
     const { origin } = req.headers;
 
-    // 1️⃣ Calculate amount safely on backend
+    if (!product || product.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No products provided",
+      });
+    }
+
     let orderAmount = 0;
+    const line_items = [];
+    const cleanProducts = [];
 
-    product.forEach((item) => {
-      orderAmount += item.price * item.quantity;
-    });
+    // 1️⃣ Fetch real prices from DB
+    for (const item of product) {
+      const productData = await Product.findById(item.productId);
 
-    // 2️⃣ Calculate delivery
+      if (!productData) continue;
+
+      const itemTotal = productData.price * item.quantity;
+      orderAmount += itemTotal;
+
+      // Prepare order items
+      cleanProducts.push({
+        productId: productData._id,
+        quantity: item.quantity,
+        customeText: item.customeText || "",
+        customeImage: item.customeImage || "",
+      });
+
+      // Stripe line item
+      line_items.push({
+        price_data: {
+          currency: "inr",
+          product_data: {
+            name: productData.title,
+          },
+          unit_amount: productData.price * 100,
+        },
+        quantity: item.quantity,
+      });
+    }
+
+    // 2️⃣ Delivery charge
     const deliveryCharges = orderAmount > 500 ? 0 : 99;
     const totalAmount = orderAmount + deliveryCharges;
 
-    // 3️⃣ Save order in DB
-    const order = await Order.create({
-      user: userId,
-      product,
-      amount: totalAmount,
-      deliveryCharges,
-      address,
-      isPaid: false,
-      paymentMethod: "STRIPE",
-    });
-
-    // 4️⃣ Create stripe line items
-    const line_items = product.map((item) => ({
-      price_data: {
-        currency: "inr",
-        product_data: {
-          name: item.title,
-        },
-        unit_amount: item.price * 100, // rupees → paise
-      },
-      quantity: item.quantity,
-    }));
-
-    // 5️⃣ Add delivery charge item
     if (deliveryCharges > 0) {
       line_items.push({
         price_data: {
@@ -89,7 +111,17 @@ const placeOrderUsingStripe = asyncHandler(async (req, res) => {
       });
     }
 
-    // 6️⃣ Create stripe session
+    // 3️⃣ Save Order in DB
+    const order = await Order.create({
+      user: userId,
+      product: cleanProducts,
+      amount: totalAmount,
+      address,
+      isPaid: false,
+      paymentMethod: "STRIPE",
+    });
+
+    // 4️⃣ Create Stripe session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -100,8 +132,8 @@ const placeOrderUsingStripe = asyncHandler(async (req, res) => {
         userId: userId.toString(),
       },
 
-      success_url: `${origin}/verify?success=true`,
-      cancel_url: `${origin}/verify?success=false`,
+      success_url: `${origin}/verify?success=true&orderId=${order._id}`,
+      cancel_url: `${origin}/verify?success=false&orderId=${order._id}`,
     });
 
     return res.status(200).json({
@@ -117,38 +149,50 @@ const placeOrderUsingStripe = asyncHandler(async (req, res) => {
   }
 });
 
-// get orders
+
+// get orders for logged in user
 const getOrdersForUser = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const orders = await Order.find({ user: userId });
+
+  const orders = await Order.find({ user: userId })
+    .populate({
+      path: "product.productId", 
+      model: "Product",
+      select: "title amount images price",
+    })
+    .sort({ createdAt: -1 });
+
   return res.status(200).json({
     success: true,
     orders,
   });
 });
 
+
 const getAllOrders = asyncHandler(async (req, res) => {
   try {
     const sellerId = req.seller._id;
 
-    const orders = await Order.find().sort({ createdAt: -1 });
+    const orders = await Order.find()
+      .populate("product.productId")
+      .sort({ createdAt: -1 });
 
-    // Keep only seller products inside each order
     const sellerOrders = orders
       .map((order) => {
         const sellerProducts = order.product.filter(
-          (item) => item.seller.toString() === sellerId.toString(),
+          (item) =>
+            item.productId &&
+            item.productId.seller.toString() === sellerId.toString(),
         );
 
-        // If this order has no products of this seller → skip
         if (sellerProducts.length === 0) return null;
 
         return {
           ...order._doc,
-          product: sellerProducts, // keep only seller items
+          product: sellerProducts,
         };
       })
-      .filter((order) => order !== null);
+      .filter(Boolean);
 
     return res.status(200).json({
       success: true,
@@ -163,13 +207,14 @@ const getAllOrders = asyncHandler(async (req, res) => {
   }
 });
 
+
 // update order status from seller panel
 const updateOrderStatus = asyncHandler(async (req, res) => {
   try {
     const { orderId, status } = req.body;
 
-    // 1️⃣ find order first
     const order = await Order.findById(orderId);
+
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -177,29 +222,27 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
       });
     }
 
-    // 2️⃣ update order status
     order.status = status;
-    await order.save();
 
-    // 3️⃣ when delivered → mark CUSTOMER as paid
-    if (status === "delivered") {
-      await User.findByIdAndUpdate(order.userId, {
-        $set: { isPaid: true },
-      });
+    // If delivered and COD → mark paid
+    if (status === "Delivered" && order.paymentMethod === "COD") {
+      order.isPaid = true;
     }
+
+    await order.save();
 
     return res.status(200).json({
       success: true,
       message: `Order ${status} successfully`,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       success: false,
       message: error.message,
     });
   }
 });
+
 
 // get orders for admin
 const getOrdersForAdmin = asyncHandler(async (req, res) => {
@@ -209,10 +252,10 @@ const getOrdersForAdmin = asyncHandler(async (req, res) => {
       select: "-password",
     })
     .populate({
-      path: "product",
+      path: "product.productId",
       populate: {
         path: "seller",
-        model: "Seller", 
+        model: "Seller",
         select: "store",
       },
     })
@@ -232,3 +275,5 @@ export {
   updateOrderStatus,
   getOrdersForAdmin,
 };
+
+uploadOnCloudinary();

@@ -37,14 +37,25 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
-    cart: {
-      type: Object,
-      default: {}, // productId : quantity
-    },
+    cart: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          default: 1,
+        },
+        customeText: String,
+        customeImage: String,
+      },
+    ],
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 //  Hash password only when modified
@@ -67,7 +78,7 @@ userSchema.methods.generateAccessToken = function () {
     process.env.ACCESS_TOKEN_SECRET,
     {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-    }
+    },
   );
 };
 
@@ -79,7 +90,7 @@ userSchema.methods.generateRefreshToken = function () {
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-    }
+    },
   );
 };
 export const User = mongoose.model("User", userSchema);

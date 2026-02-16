@@ -53,26 +53,45 @@ const AppContextProvider = (props) => {
     }
   };
 
-  const fetchAllOrders = async () => {
-    if (!sellerLoggedIn) return;
+const fetchAllOrders = async () => {
+  if (!sellerLoggedIn) return;
 
-    try {
-      setLoading(true);
-      const { data } = await axios.get(`${backendUrl}/order/all-orders`, {
-        withCredentials: true,
+  try {
+    setLoading(true);
+
+    const { data } = await axios.get(`${backendUrl}/order/all-orders`, {
+      withCredentials: true,
+    });
+
+    if (data.success) {
+      let formattedOrders = [];
+
+      // 🔥 flatten orders → order items (admin friendly)
+      data.orders.forEach((order) => {
+        order.product.forEach((item) => {
+          formattedOrders.push({
+            ...item,
+            product: item.productId, // populated product
+            orderId: order._id,
+            customer: order.address.firstName + " " + order.address.lastName,
+            paymentMethod: order.paymentMethod,
+            status: order.status,
+            date: order.createdAt,
+            isPaid: order.isPaid,
+          });
+        });
       });
 
-      if (data.success) {
-        setOrders(data.orders);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-    } finally {
-      setLoading(false);
+      setOrders(formattedOrders);
+    } else {
+      toast.error(data.message);
     }
-  };
+  } catch (error) {
+    toast.error(error.response?.data?.message || error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   //  auto-fetch products when token changes (refresh login)
   useEffect(() => {

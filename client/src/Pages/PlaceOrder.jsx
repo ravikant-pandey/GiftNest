@@ -16,7 +16,6 @@ const PlaceOrder = () => {
     setCartItems,
     getCartAmount,
     delivery_fees,
-    products,
   } = useContext(AppContext);
 
   const [formData, setFormData] = useState({
@@ -39,45 +38,26 @@ const PlaceOrder = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
-    // Prevent empty cart order
-    if (Object.keys(cartItems).length === 0) {
+    if (cartItems.length === 0) {
       toast.error("Cart is empty");
       return;
     }
 
     try {
-      // Convert cart object → order items array
-      let orderItems = [];
-
-      for (const productId in cartItems) {
-        const quantity = cartItems[productId];
-
-        const productData = products.find((p) => p._id === productId);
-        if (!productData) continue;
-
-        const itemInfo = structuredClone(productData);
-        itemInfo.quantity = quantity;
-
-        orderItems.push(itemInfo);
-      }
-
       let price = getCartAmount();
 
-      if (price > 500) {
-        // free delivery
-        price = price;
-      } else {
-        // add delivery fee
-        price = price + delivery_fees;
+      if (price <= 500) {
+        price += delivery_fees;
       }
 
-      // Create order data
       const orderData = {
         address: formData,
-        product: orderItems,
+        product: cartItems, // 🔥 direct send
         amount: price,
       };
-      // COD
+
+      console.log(orderData);
+
       if (method === "cod") {
         const { data } = await axios.post(
           `${backendUrl}/order/place-order`,
@@ -86,14 +66,13 @@ const PlaceOrder = () => {
         );
 
         if (data.success) {
-          setCartItems({});
+          setCartItems([]); // 🔥 array empty
           navigate("/orders");
         } else {
           toast.error(data.message);
         }
       }
 
-      // STRIPE
       if (method === "stripe") {
         const { data } = await axios.post(
           `${backendUrl}/order/place-order-stripe`,

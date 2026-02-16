@@ -11,6 +11,9 @@ const Product = () => {
   const { products, backendUrl, currency, addToCart } = useContext(AppContext);
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
+  const [personalisedText, setPersonalisedText] = useState("");
+  const [personalisedImage, setPersonalisedImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
 
   const fetchProductData = async () => {
     try {
@@ -25,6 +28,45 @@ const Product = () => {
       toast.error(error.message);
     }
   };
+
+const handleAddToCart = async () => {
+  if (productData.category === "customizable") {
+    if (!personalisedText.trim() && !personalisedImage) {
+      toast.error("Please add text or upload image");
+      return;
+    }
+
+    let imageUrl = null;
+
+    try {
+      if (personalisedImage) {
+        const formData = new FormData();
+        formData.append("image", personalisedImage);
+
+        const uploadRes = await axios.post(
+          `${backendUrl}/upload/upload-custom-image`,
+          formData,
+          {
+            withCredentials: true,
+            headers: { "Content-Type": "multipart/form-data" },
+          },
+        );
+
+        imageUrl = uploadRes.data.imageUrl;
+      }
+
+      addToCart(productData._id, personalisedText || null, imageUrl || null);
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+
+    return;
+  }
+
+  // normal product
+  addToCart(productData._id);
+};
+
 
   useEffect(() => {
     fetchProductData();
@@ -73,9 +115,65 @@ const Product = () => {
           <p className="mt-5 text-gray-500 md:w-4/5">
             {productData.description}
           </p>
+          {productData.category === "customizable" && (
+            <div className="mt-6 bg-white p-6 rounded-xl shadow-md border">
+              <form className="flex flex-col gap-5">
+                {/* Text Input */}
+                <div className="flex flex-col gap-2">
+                  <label className="font-medium text-gray-700">
+                    Add Personalised Text
+                  </label>
+
+                  <input
+                    type="text"
+                    placeholder="Eg: Happy Birthday Raj ❤️"
+                    required
+                    value={personalisedText}
+                    onChange={(e) => setPersonalisedText(e.target.value)}
+                    className="border rounded-lg px-4 py-2 outline-none 
+                     focus:ring-2 focus:ring-black 
+                     transition"
+                  />
+                </div>
+
+                {/* File Upload */}
+                <div className="flex flex-col gap-2">
+                  <label className="font-medium text-gray-700">
+                    Upload Image
+                  </label>
+
+                  <label className="border-2 rounded-lg p-2 text-center cursor-pointer hover:bg-gray-50 transition">
+                    <p className="text-gray-500">Click to upload image</p>
+                    <p className="text-sm text-gray-400">PNG, JPG up to 5MB</p>
+                    <input
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        setPersonalisedImage(file);
+                        setPreviewImage(URL.createObjectURL(file));
+                      }}
+                      type="file"
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                {previewImage && (
+                  <div className="mt-3">
+                    <p className="text-sm text-green-600 mb-2">
+                      Image selected successfully ✅
+                    </p>
+                    <img
+                      src={previewImage}
+                      alt="Preview"
+                      className="w-32 h-32 object-cover rounded-lg border"
+                    />
+                  </div>
+                )}
+              </form>
+            </div>
+          )}
 
           <button
-            onClick={() => addToCart(productData._id)}
+            onClick={handleAddToCart}
             className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700 mt-4 rounded-2xl"
           >
             ADD TO CART
@@ -95,21 +193,7 @@ const Product = () => {
           <p className="border px-5 py-3 text-sm">Reviews (122)</p>
         </div>
         <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500">
-          <p>
-            An e-commerce website is an online platform that facilitates the
-            buying and selling of products or services over the internet. It
-            serves as a virtual marketplace where businesses and individuals can
-            showcase their products, interact with customers, and conduct
-            transactions without the need for a physical presence. E-commerce
-            websites have gained immense popularity due to their convenience,
-            accessibility, and the global reach they offer.
-          </p>
-          <p>
-            E-commerce websites typically display products or services along
-            with detailed descriptions, images, prices, and any available
-            variations (e.g., sizes, colors). Each product usually has its own
-            dedicated page with relevant information.
-          </p>
+          {productData.description}
         </div>
       </div>
       {/* display related products */}

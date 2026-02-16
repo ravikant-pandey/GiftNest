@@ -82,20 +82,23 @@ const Dashboard = () => {
     }
   };
 
+  // 💰 TOTAL REVENUE (only paid orders)
   const revenue = orders
-    .filter((o) => o.isPaid === true)
-    .reduce((sum, o) => sum + o.amount, 0);
+    .filter((o) => o.isPaid)
+    .reduce((sum, o) => sum + (o.product?.price || 0) * o.quantity, 0);
+
+  // 📦 TOTAL ORDER VALUE (all orders)
+  const totalOrderValue = orders.reduce(
+    (sum, o) => sum + (o.product?.price || 0) * o.quantity,
+    0,
+  );
 
   const vendorData = {
     totalOrders: orders.length,
     totalSales: revenue,
     totalProducts: productList.length,
     avgOrder:
-      orders.length > 0
-        ? (
-            orders.reduce((acc, order) => acc + order.amount, 0) / orders.length
-          ).toFixed(2)
-        : 0,
+      orders.length > 0 ? (totalOrderValue / orders.length).toFixed(2) : 0,
   };
 
   const StatCard = ({ icon: Icon, title, value }) => (
@@ -314,7 +317,7 @@ const EditModal = ({
               <option value="wedding">Wedding</option>
               <option value="anniversary">Anniversary</option>
               <option value="flowers">Flowers</option>
-              <option value="customized">Customized</option>
+              <option value="customizable">Customized</option>
               <option value="chocolates">Chocolates</option>
               <option value="plants">Plants</option>
             </select>

@@ -5,25 +5,28 @@ import { AppContext } from "../context/AppContext";
 const AllOrders = () => {
   const { isAdminLoggedIn, orders } = useContext(AppContext);
   const [formattedOrders, setFormattedOrders] = useState([]);
+
   useEffect(() => {
     if (!isAdminLoggedIn || !orders?.length) return;
 
-    const data = orders.map((odr) => {
-      const product = odr.product?.[0];
+    const data = orders.map((order) => {
+      const item = order.product[0]; // first product in order
+      const product = item?.productId; // populated product
 
       return {
-        id: odr._id,
-        customerName: odr.user?.name,
-        customerImage: odr.user?.avatar || assets.profile_icon,
+        id: order._id,
+
+        customerName: order.user?.name,
+        customerImage: order.user?.avatar || assets.profile_icon,
 
         productName: product?.title,
         productImage: product?.images?.[0] || assets.product_icon,
 
         store: product?.seller?.store || "Main Store",
 
-        date: odr.createdAt,
-        amount: odr.amount,
-        status: odr.status,
+        date: order.createdAt,
+        amount: order.amount, // full order amount
+        status: order.status,
       };
     });
 

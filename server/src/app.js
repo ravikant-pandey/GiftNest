@@ -39,6 +39,7 @@ import sellerRoute from "./routes/seller.route.js";
 import adminRoute from "./routes/admin.route.js";
 import productRoute from "./routes/product.route.js";
 import cartRoute from "./routes/cart.route.js";
+import uploadRoute from "./routes/upload.route.js";
 import orderRoute from "./routes/order.route.js";
 
 //  Mount routes
@@ -47,6 +48,7 @@ app.use("/api/v1/seller", sellerRoute);
 app.use("/api/v1/admin", adminRoute);
 app.use("/api/v1/product", productRoute);
 app.use("/api/v1/cart", cartRoute);
+app.use("/api/v1/upload", uploadRoute);
 app.use("/api/v1/order", orderRoute);
 
 app.use((err, req, res, next) => {
