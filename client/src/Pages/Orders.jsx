@@ -2,11 +2,11 @@ import { useContext, useEffect, useState } from "react";
 import Title from "../Components/Title/Title";
 import axios from "axios";
 import { AppContext } from "../Context/AppContext";
+import toast from "react-hot-toast";
 
 const Orders = () => {
   const { currency, backendUrl, isLoggedIn } = useContext(AppContext);
   const [orderData, setOrderData] = useState([]);
-
   const loadOrderData = async () => {
     try {
       if (!isLoggedIn) return;
@@ -15,25 +15,34 @@ const Orders = () => {
         withCredentials: true,
       });
 
-      if (data.success) {
-        let formattedOrders = [];
+      // ⭐ API safety check
+      if (!data?.success || !Array.isArray(data.orders)) {
+        setOrderData([]);
+        return;
+      }
 
-        // 🔥 flatten orders → order items
-        data.orders.forEach((order) => {
-          order.product.forEach((item) => {
-            formattedOrders.push({
-              ...item,
-              status: order.status,
-              paymentMethod: order.paymentMethod,
-              date: order.createdAt,
-            });
+      const formattedOrders = [];
+
+      data.orders.forEach((order) => {
+        // ⭐ Stripe race condition guard
+        if (!order || !Array.isArray(order.product)) return;
+
+        order.product.forEach((item) => {
+          // ⭐ extra safety (very important)
+          if (!item?.productId) return;
+
+          formattedOrders.push({
+            ...item,
+            status: order.status,
+            paymentMethod: order.paymentMethod,
+            date: order.createdAt,
           });
         });
+      });
 
-        setOrderData(formattedOrders);
-      }
+      setOrderData(formattedOrders);
     } catch (error) {
-      console.log(error);
+      toast.error(error.message);
     }
   };
 

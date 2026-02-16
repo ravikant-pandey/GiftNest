@@ -12,7 +12,13 @@ const Cart = () => {
 
   // Convert cart array → UI usable data
   useEffect(() => {
-    if (products.length > 0 && cartItems.length > 0) {
+    // ⭐ when cart empty, clear UI
+    if (cartItems.length === 0) {
+      setCartData([]);
+      return;
+    }
+
+    if (products.length > 0) {
       const tempData = cartItems.map((item) => {
         const productData = products.find(
           (product) => product._id === item.productId,
@@ -29,6 +35,13 @@ const Cart = () => {
       setCartData(tempData.filter(Boolean));
     }
   }, [cartItems, products]);
+
+
+  {
+    cartData.length === 0 && (
+      <p className="text-center text-gray-500 mt-10">Your cart is empty 🛒</p>
+    );
+  }
 
   return (
     <div className="border-t pt-14">

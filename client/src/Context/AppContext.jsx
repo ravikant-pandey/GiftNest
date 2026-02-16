@@ -114,7 +114,6 @@ const AppContextProvider = ({ children }) => {
   const getCartCount = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
-  
 
   // CART TOTAL AMOUNT
   const getCartAmount = () => {

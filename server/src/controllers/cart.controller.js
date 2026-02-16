@@ -45,8 +45,7 @@ const addToCart = asyncHandler(async (req, res) => {
 
 const updateCart = asyncHandler(async (req, res) => {
   const { cartItemId, quantity } = req.body;
-  const userId = req.user._id;
-
+  const userId = req.user._id;  
   if (quantity < 0) {
     return res.status(400).json({
       success: false,
@@ -56,19 +55,23 @@ const updateCart = asyncHandler(async (req, res) => {
 
   const user = await User.findById(userId);
 
-  const item = user.cart.id(cartItemId);
+  // ⭐ find item index (NOT user.cart.id)
+  const itemIndex = user.cart.findIndex(
+    (item) => item._id.toString() === cartItemId,
+  );
 
-  if (!item) {
+  if (itemIndex === -1) {
     return res.status(404).json({
       success: false,
       message: "Cart item not found",
     });
   }
 
+  // ⭐ DELETE ITEM
   if (quantity === 0) {
-    item.remove();
+    user.cart.splice(itemIndex, 1);
   } else {
-    item.quantity = quantity;
+    user.cart[itemIndex].quantity = quantity;
   }
 
   await user.save();
@@ -79,8 +82,6 @@ const updateCart = asyncHandler(async (req, res) => {
     cart: user.cart,
   });
 });
-
-
 
 // get cart data for particular user
 const getCartData = asyncHandler(async (req, res) => {

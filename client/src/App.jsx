@@ -20,7 +20,6 @@ import Anniversary from "./Pages/Anniversary";
 import Navbar from "./Components/Navbar/Navbar";
 import Profile from "./Pages/Profile";
 import Plants from "./Pages/Plants";
-import CustomizableProducts from "./Pages/CustomizableProducts";
 import NotFound from "./Pages/NotFound";
 import Verify from "./Pages/Verify";
 
@@ -49,10 +48,7 @@ function App() {
           <Route path="/flowers" element={<Flowers />} />
           <Route path="/chocolates" element={<Chocolates />} />
           <Route path="/plants" element={<Plants />} />
-
-          {/* ✅ Customizable Flow */}
-          <Route path="/customizable" element={<CustomizableProducts />} />
-          <Route path="/customize/:id" element={<Customized />} />
+          <Route path="/customizable" element={<Customized />} />
 
           {/* Profile */}
           <Route path="/profile" element={<Profile />} />

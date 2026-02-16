@@ -56,8 +56,6 @@ const PlaceOrder = () => {
         amount: price,
       };
 
-      console.log(orderData);
-
       if (method === "cod") {
         const { data } = await axios.post(
           `${backendUrl}/order/place-order`,

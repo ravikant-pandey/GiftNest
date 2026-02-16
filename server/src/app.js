@@ -41,6 +41,8 @@ import productRoute from "./routes/product.route.js";
 import cartRoute from "./routes/cart.route.js";
 import uploadRoute from "./routes/upload.route.js";
 import orderRoute from "./routes/order.route.js";
+import subscribeRoute from "./routes/newsletter.route.js";
+
 
 //  Mount routes
 app.use("/api/v1/user", userRoute);
@@ -50,6 +52,7 @@ app.use("/api/v1/product", productRoute);
 app.use("/api/v1/cart", cartRoute);
 app.use("/api/v1/upload", uploadRoute);
 app.use("/api/v1/order", orderRoute);
+app.use("/api/v1/newsletter",subscribeRoute)
 
 app.use((err, req, res, next) => {
   res.status(err.statusCode || 500).json({

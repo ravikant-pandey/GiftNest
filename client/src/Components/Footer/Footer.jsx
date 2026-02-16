@@ -1,8 +1,29 @@
 import { FaFacebook, FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { assets } from "../../assets/frontend_assets/assets";
+import { useContext, useState } from "react";
+import { AppContext } from "../../Context/AppContext";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 function Footer() {
+  const [email, setEmail] = useState("");
+  const { backendUrl } = useContext(AppContext);
+
+  const onEmailSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await axios.post(`${backendUrl}/newsletter/subscribe`, {
+        email,
+      });
+      if (data.success) {
+        toast.success(data.message);
+        setEmail("");
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
   return (
     <footer className="bg-white shadow px-5 mt-10">
       <div className="flex flex-wrap justify-between gap-12 md:gap-6">
@@ -106,8 +127,14 @@ function Footer() {
               type="email"
               className="bg-white rounded-l border border-gray-300 h-9 px-3 outline-none w-full"
               placeholder="Your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
-            <button className="bg-black h-9 w-10 rounded-r flex items-center justify-center">
+            <button
+              className="bg-black h-9 w-10 rounded-r flex items-center justify-center"
+              onClick={onEmailSubmit}
+            >
               <img
                 src={assets.dropdown_icon}
                 alt="submit"

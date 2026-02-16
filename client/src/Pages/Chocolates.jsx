@@ -20,9 +20,9 @@ function Chocolates() {
           {products.map((item, index) => (
             <ProductItems
               key={index}
-              name={item.name}
+              name={item.title}
               price={item.price}
-              image={item.image}
+              image={item.images[0]}
               id={item._id}
             />
           ))}
