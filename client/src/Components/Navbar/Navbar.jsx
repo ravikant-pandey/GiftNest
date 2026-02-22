@@ -181,9 +181,7 @@ function Navbar() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <p
-                      className="cursor-pointer hover:bg-gray-100 p-2"
-                    >
+                    <p className="cursor-pointer hover:bg-gray-100 p-2">
                       Admin
                     </p>
                   </a>
@@ -257,22 +255,26 @@ function Navbar() {
             >
               My Profile
             </NavLink>
-            <a
-              href="https://admin-giftnest.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <p className="cursor-pointer hover:bg-gray-100 p-2">Admin</p>
-            </a>
-            <a
-              href="https://seller-giftnest.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <p className="cursor-pointer hover:bg-gray-100 p-2">
-                Become a Seller / Supplier
-              </p>
-            </a>
+            {!isLoggedIn && (
+              <div>
+                <a
+                  href="https://admin-giftnest.vercel.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <p className="cursor-pointer hover:bg-gray-100 p-2">Admin</p>
+                </a>
+                <a
+                  href="https://seller-giftnest.vercel.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <p className="cursor-pointer hover:bg-gray-100 p-2">
+                    Become a Seller / Supplier
+                  </p>
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>

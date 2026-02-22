@@ -152,11 +152,6 @@ const Dashboard = () => {
             title="Total Product"
             value={vendorData.totalProducts}
           />
-          <StatCard
-            icon={FiBarChart}
-            title="Average Order"
-            value={`${currency}${vendorData.avgOrder}`}
-          />
         </div>
 
         {/* PRODUCTS */}

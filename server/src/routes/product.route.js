@@ -5,6 +5,7 @@ import {
   getAllProducts,
   getSellerProducts,
   getSingleProduct,
+  searchProducts,
   toggleFeatured,
   updateProduct,
 } from "../controllers/product.controller.js";
@@ -26,5 +27,8 @@ router.put("/update-product/:id", verifySeller, updateProduct);
 router.delete("/delete-product/:id", verifySeller, deleteProduct);
 router.put("/toggle-featured/:id", verifySeller, toggleFeatured);
 router.get("/seller-product", verifySeller, getSellerProducts);
+
+// Search Products
+router.get("/search", searchProducts);
 
 export default router;

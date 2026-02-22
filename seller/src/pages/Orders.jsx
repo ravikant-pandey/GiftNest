@@ -7,6 +7,7 @@ import { AppContext } from "../Context/AppContext";
 const Orders = () => {
   const { backendUrl, currency, loading, orders, fetchAllOrders } =
     useContext(AppContext);
+  console.log(orders);
 
   const statusHandler = async (event, orderId) => {
     const newStatus = event.target.value;
@@ -77,13 +78,28 @@ const Orders = () => {
                     Quantity: <b>{order.quantity}</b>
                   </p>
 
-                  <p className="mt-2">
-                    Customer: <b>{order.customer}</b>
-                  </p>
+                  {order.product.category === "customizable" && (
+                    <div>
+                      <p className="mt-2">
+                        Customer: <b>{order.customer}</b>
+                      </p>
 
-                  <p className="mt-2 text-gray-500">
-                    {order.date.split("T")[0]}
-                  </p>
+                      <p className="mt-2 text-gray-500">
+                        {order.date.split("T")[0]}
+                      </p>
+                      <p className="mt-2 text-gray-500">
+                        CustomeText:{" "}
+                        <span className="text-blue-500">
+                          {order.customeText}
+                        </span>
+                      </p>
+                      <img
+                        className="w-12"
+                        src={order.customeImage}
+                        alt={order.customeImage}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Payment Info */}

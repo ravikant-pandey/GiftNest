@@ -25,7 +25,6 @@ const getAllProducts = asyncHandler(async (req, res) => {
   }
 });
 
-
 // create product
 const createProduct = asyncHandler(async (req, res) => {
   const {
@@ -215,6 +214,57 @@ const getSingleProduct = asyncHandler(async (req, res) => {
   }
 });
 
+// custome search
+const searchProducts = asyncHandler(async (req, res) => {
+  let { keyword } = req.query;
+
+  //  Validate keyword
+  if (!keyword || keyword.trim() === "") {
+    return res.status(400).json({
+      success: false,
+      message: "Keyword is required",
+    });
+  }
+
+  keyword = keyword.trim();
+
+  //  Escape regex special characters (security)
+  const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  //  Base query (case-insensitive search)
+  const query = {
+    $or: [
+      { title: { $regex: escapedKeyword, $options: "i" } },
+      { description: { $regex: escapedKeyword, $options: "i" } },
+      { category: { $regex: escapedKeyword, $options: "i" } },
+      { subCategory: { $regex: escapedKeyword, $options: "i" } },
+    ],
+  };
+
+  // If keyword is number → search exact price
+  if (!isNaN(keyword)) {
+    query.$or.push({ price: Number(keyword) });
+  }
+
+  // If keyword is true/false → search bestseller
+  if (keyword.toLowerCase() === "true" || keyword.toLowerCase() === "false") {
+    query.$or.push({
+      bestseller: keyword.toLowerCase() === "true",
+    });
+  }
+
+  // Execute query
+  const products = await Product.find(query).sort({
+    createdAt: -1,
+  });
+
+  res.status(200).json({
+    success: true,
+    count: products.length,
+    products,
+  });
+});
+
 export {
   getAllProducts,
   createProduct,
@@ -223,4 +273,5 @@ export {
   toggleFeatured,
   updateProduct,
   getSingleProduct,
+  searchProducts,
 };

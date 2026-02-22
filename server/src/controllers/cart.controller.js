@@ -15,11 +15,13 @@ const addToCart = asyncHandler(async (req, res) => {
   }
 
   // Check if same product + same customization already exists
+  user.cart = user.cart.filter((item) => item.productId);
+
   const existingItem = user.cart.find(
     (item) =>
       item.productId.toString() === productId &&
-      item.customeText === customeText &&
-      item.customeImage === customeImage,
+      (item.customeText || "") === (customeText || "") &&
+      (item.customeImage || "") === (customeImage || ""),
   );
 
   if (existingItem) {

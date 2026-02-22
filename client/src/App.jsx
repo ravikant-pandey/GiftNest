@@ -22,6 +22,7 @@ import Profile from "./Pages/Profile";
 import Plants from "./Pages/Plants";
 import NotFound from "./Pages/NotFound";
 import Verify from "./Pages/Verify";
+import SearchPage from "./Pages/SearchPage";
 
 function App() {
   return (
@@ -49,6 +50,7 @@ function App() {
           <Route path="/chocolates" element={<Chocolates />} />
           <Route path="/plants" element={<Plants />} />
           <Route path="/customizable" element={<Customized />} />
+          <Route path="/search" element={<SearchPage />} />
 
           {/* Profile */}
           <Route path="/profile" element={<Profile />} />

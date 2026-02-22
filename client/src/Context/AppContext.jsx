@@ -29,6 +29,9 @@ const AppContextProvider = ({ children }) => {
 
   const [products, setProducts] = useState([]);
 
+  const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+
   // FETCH PRODUCTS
   const getProducts = async () => {
     try {
@@ -179,6 +182,12 @@ const AppContextProvider = ({ children }) => {
     updateQuantity,
     getCartCount,
     getCartAmount,
+
+    // search
+    search,
+    setSearch,
+    searchResults,
+    setSearchResults,
 
     // misc
     backendUrl,
