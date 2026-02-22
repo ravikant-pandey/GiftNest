@@ -49,105 +49,102 @@ const placeOrder = asyncHandler(async (req, res) => {
 
 // placing order using STRIPE
 const placeOrderUsingStripe = asyncHandler(async (req, res) => {
-  try {
-    const { product, address } = req.body;
-    const userId = req.user._id;
-    const { origin } = req.headers;
+  const { product, address } = req.body;
+  const userId = req.user._id;
+  const { origin } = req.headers;
 
-    if (!product || product.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No products provided",
-      });
-    }
-
-    let orderAmount = 0;
-    const line_items = [];
-    const cleanProducts = [];
-
-    // 1️⃣ Fetch real prices from DB
-    for (const item of product) {
-      const productData = await Product.findById(item.productId);
-
-      if (!productData) continue;
-
-      const itemTotal = productData.price * item.quantity;
-      orderAmount += itemTotal;
-
-      // Prepare order items
-      cleanProducts.push({
-        productId: productData._id,
-        quantity: item.quantity,
-        customeText: item.customeText || "",
-        customeImage: item.customeImage || "",
-      });
-
-      // Stripe line item
-      line_items.push({
-        price_data: {
-          currency: "inr",
-          product_data: {
-            name: productData.title,
-          },
-          unit_amount: productData.price * 100,
-        },
-        quantity: item.quantity,
-      });
-    }
-
-    // 2️⃣ Delivery charge
-    const deliveryCharges = orderAmount > 500 ? 0 : 99;
-    const totalAmount = orderAmount + deliveryCharges;
-
-    if (deliveryCharges > 0) {
-      line_items.push({
-        price_data: {
-          currency: "inr",
-          product_data: {
-            name: "Delivery Charges",
-          },
-          unit_amount: deliveryCharges * 100,
-        },
-        quantity: 1,
-      });
-    }
-
-    // 3️⃣ Save Order in DB
-    const order = await Order.create({
-      user: userId,
-      product: cleanProducts,
-      amount: totalAmount,
-      address,
-      isPaid: false,
-      paymentMethod: "STRIPE",
-    });
-
-    // 4️⃣ Create Stripe session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      line_items,
-
-      metadata: {
-        orderId: order._id.toString(),
-        userId: userId.toString(),
-      },
-
-      success_url: `${origin}/verify?success=true&orderId=${order._id}`,
-      cancel_url: `${origin}/verify?success=false&orderId=${order._id}`,
-    });
-
-    return res.status(200).json({
-      success: true,
-      session_url: session.url,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
+  if (!product || product.length === 0) {
+    return res.status(400).json({
       success: false,
-      message: error.message,
+      message: "No products provided",
     });
   }
+
+  let orderAmount = 0;
+  const line_items = [];
+  const cleanProducts = [];
+
+  //  Fetch all products in one query
+  const productIds = product.map((item) => item.productId);
+  const productsFromDB = await Product.find({
+    _id: { $in: productIds },
+  });
+
+  for (const item of product) {
+    const productData = productsFromDB.find(
+      (p) => p._id.toString() === item.productId,
+    );
+
+    if (!productData || item.quantity <= 0) continue;
+
+    const itemTotal = productData.price * item.quantity;
+    orderAmount += itemTotal;
+
+    cleanProducts.push({
+      productId: productData._id,
+      quantity: item.quantity,
+      customeText: item.customeText || "",
+      customeImage: item.customeImage || "",
+    });
+
+    line_items.push({
+      price_data: {
+        currency: "inr",
+        product_data: {
+          name: productData.title,
+        },
+        unit_amount: productData.price * 100,
+      },
+      quantity: item.quantity,
+    });
+  }
+
+  if (cleanProducts.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: "No valid products found",
+    });
+  }
+
+  const deliveryCharges = orderAmount > 500 ? 0 : 99;
+  const totalAmount = orderAmount + deliveryCharges;
+
+  if (deliveryCharges > 0) {
+    line_items.push({
+      price_data: {
+        currency: "inr",
+        product_data: { name: "Delivery Charges" },
+        unit_amount: deliveryCharges * 100,
+      },
+      quantity: 1,
+    });
+  }
+
+  const order = await Order.create({
+    user: userId,
+    product: cleanProducts,
+    amount: totalAmount,
+    address,
+    isPaid: false,
+    paymentMethod: "STRIPE",
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    mode: "payment",
+    line_items,
+    metadata: {
+      orderId: order._id.toString(),
+      userId: userId.toString(),
+    },
+    success_url: `${origin}/verify?success=true&orderId=${order._id}`,
+    cancel_url: `${origin}/verify?success=false&orderId=${order._id}`,
+  });
+
+  res.status(200).json({
+    success: true,
+    session_url: session.url,
+  });
 });
 
 // get orders for logged in user
