@@ -1,4 +1,4 @@
-import  { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { FaCheckCircle, FaTimesCircle, FaCreditCard } from "react-icons/fa";
 import { CgSpinner } from "react-icons/cg";
 import { useSearchParams } from "react-router-dom";
@@ -19,8 +19,7 @@ const Verify = () => {
         setStatus("success");
 
         // clear cart locally
-        setCartItems({});
-
+        setCartItems([]);
         // auto redirect after success
         setTimeout(() => {
           navigate("/orders");
