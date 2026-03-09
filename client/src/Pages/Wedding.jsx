@@ -17,12 +17,12 @@ function Wedding() {
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {products.map((item, index) => (
+          {weddingProducts.map((item, index) => (
             <ProductItems
               key={index}
-              name={item.name}
+              title={item.title}
               price={item.price}
-              image={item.image}
+              images={item.images}
               id={item._id}
             />
           ))}

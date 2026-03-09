@@ -17,12 +17,12 @@ function Chocolates() {
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {products.map((item, index) => (
+          {chocolatesProducts.map((item, index) => (
             <ProductItems
               key={index}
-              name={item.title}
+              title={item.title}
               price={item.price}
-              image={item.images[0]}
+              images={item.images}
               id={item._id}
             />
           ))}

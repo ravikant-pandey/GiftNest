@@ -8,7 +8,6 @@ function Festival() {
   const festivalProducts = products.filter(
     (item) => item.category?.toLowerCase() === "festival",
   );
-
   return (
     <div className="mt-10">
       {festivalProducts.length === 0 ? (

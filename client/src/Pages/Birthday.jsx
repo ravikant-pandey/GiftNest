@@ -8,7 +8,6 @@ function Birthday() {
   const birthdayProducts = products.filter(
     (item) => item.category?.toLowerCase() === "birthday",
   );
-
   return (
     <div className="mt-10">
       {birthdayProducts.length === 0 ? (
@@ -19,7 +18,7 @@ function Birthday() {
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {products.map((item, index) => (
+          {birthdayProducts.map((item, index) => (
             <ProductItems
               key={index}
               title={item.title}
