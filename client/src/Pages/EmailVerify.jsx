@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { AppContext } from "../context/AppContext";
+import { AppContext } from "../Context/AppContext";
 function EmailVerify() {
   const navigate = useNavigate();
   const [otp, setOtp] = useState(Array(6).fill(""));
