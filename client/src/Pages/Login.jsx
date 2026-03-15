@@ -140,7 +140,7 @@ function Login() {
       {currentState === "login" && (
         <p
           className="text-sm text-right w-full underline cursor-pointer"
-          onClick={() => navigate("/forgot-password")}
+          onClick={() => navigate("/reset-password")}
         >
           Forgot Password?
         </p>

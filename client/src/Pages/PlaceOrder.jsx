@@ -16,6 +16,7 @@ const PlaceOrder = () => {
     setCartItems,
     getCartAmount,
     delivery_fees,
+    userData,
   } = useContext(AppContext);
 
   const [formData, setFormData] = useState({
@@ -43,6 +44,10 @@ const PlaceOrder = () => {
       return;
     }
 
+    if (!userData.isVerified) {
+      toast.error("Please verify your email to place order");
+      return navigate("/email-verify");
+    }
     try {
       let price = getCartAmount();
 

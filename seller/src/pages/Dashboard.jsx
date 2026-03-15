@@ -1,8 +1,9 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../Context/AppContext";
-import { FiDollarSign, FiShoppingBag, FiBarChart } from "react-icons/fi";
+import { FiShoppingBag } from "react-icons/fi";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
+import { FaRupeeSign } from "react-icons/fa6";
 
 import { assets } from "../assets/admin_assets/assets";
 import { Edit } from "lucide-react";
@@ -138,7 +139,7 @@ const Dashboard = () => {
         {/* STATS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <StatCard
-            icon={FiDollarSign}
+            icon={FaRupeeSign}
             title="Total Revenue"
             value={`${currency}${vendorData.totalSales.toFixed(2)}`}
           />

@@ -27,6 +27,23 @@ function Navbar() {
   const [openMoreDropdown, setOpenMoreDropdown] = useState(false);
   const moreDropdownRef = useRef();
 
+  const handleSendVerifyOtp = async () => {
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/user/sent-verify-otp`,
+        {},
+        { withCredentials: true },
+      );
+      if (data.success) {
+        navigate("/email-verify");
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message || "Failed to send verify otp");
+    }
+  };
   const handleLogout = async () => {
     try {
       const { data } = await axios.get(`${backendUrl}/user/logout`, {
@@ -118,6 +135,7 @@ function Navbar() {
 
             {openDropdown && (
               <div className="absolute right-[-60px] mt-5 bg-white shadow-md rounded border w-[220px] p-2 text-sm z-50">
+                {/* User Info */}
                 <div className="flex items-center gap-3 p-2 border-b pb-3">
                   <img
                     src={userData?.avatar || assets.profile_icon}
@@ -128,25 +146,41 @@ function Navbar() {
                     <p className="font-semibold">{userData?.name || "Guest"}</p>
                   </div>
                 </div>
-                <p
-                  onClick={() => navigate("/orders")}
-                  className="cursor-pointer hover:bg-gray-100 p-2"
-                >
-                  My Orders
-                </p>
-                <p
-                  onClick={() => navigate("/profile")}
-                  className="cursor-pointer hover:bg-gray-100 p-2"
-                >
-                  My Profile
-                </p>
-                {isLoggedIn && (
+
+                {/* If user NOT verified */}
+                {isLoggedIn && !userData?.isVerified && (
                   <p
-                    onClick={handleLogout}
-                    className="cursor-pointer hover:bg-gray-100 p-2"
+                    className="cursor-pointer hover:bg-gray-100 p-2 text-red-500"
+                    onClick={handleSendVerifyOtp}
                   >
-                    Logout
+                    Verify Account
                   </p>
+                )}
+
+                {/* If user verified */}
+                {isLoggedIn && userData?.isVerified && (
+                  <>
+                    <p
+                      onClick={() => navigate("/orders")}
+                      className="cursor-pointer hover:bg-gray-100 p-2"
+                    >
+                      My Orders
+                    </p>
+
+                    <p
+                      onClick={() => navigate("/profile")}
+                      className="cursor-pointer hover:bg-gray-100 p-2"
+                    >
+                      My Profile
+                    </p>
+
+                    <p
+                      onClick={handleLogout}
+                      className="cursor-pointer hover:bg-gray-100 p-2"
+                    >
+                      Logout
+                    </p>
+                  </>
                 )}
               </div>
             )}

@@ -7,7 +7,6 @@ import { AppContext } from "../Context/AppContext";
 const Orders = () => {
   const { backendUrl, currency, loading, orders, fetchAllOrders } =
     useContext(AppContext);
-  console.log(orders);
 
   const statusHandler = async (event, orderId) => {
     const newStatus = event.target.value;

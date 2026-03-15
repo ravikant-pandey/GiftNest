@@ -52,6 +52,26 @@ const userSchema = new Schema(
         customeImage: String,
       },
     ],
+    verifyOtp: {
+      type: String,
+      default: "",
+    },
+    verifyOtpExpiryAt: {
+      type: Number,
+      default: 0,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    resetOtp: {
+      type: String,
+      default: "",
+    },
+    resetOtpExpiryAt: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

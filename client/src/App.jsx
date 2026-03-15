@@ -23,6 +23,8 @@ import Plants from "./Pages/Plants";
 import NotFound from "./Pages/NotFound";
 import Verify from "./Pages/Verify";
 import SearchPage from "./Pages/SearchPage";
+import ResetPassword from "./Pages/ResetPassword";
+import EmailVerify from "./Pages/EmailVerify";
 
 function App() {
   return (
@@ -54,7 +56,10 @@ function App() {
 
           {/* Profile */}
           <Route path="/profile" element={<Profile />} />
+          
           <Route path="*" element={<NotFound />} />
+          <Route path="/email-verify" element={<EmailVerify />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           <Route path="/verify" element={<Verify />} />
         </Routes>

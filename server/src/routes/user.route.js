@@ -5,9 +5,13 @@ import {
   loginUser,
   logoutUser,
   registerUser,
+  resetPassword,
+  sendPasswordResetOtp,
+  sentVerifyOtp,
   updateAvatar,
   updatePassword,
   updateProfile,
+  verifyEmail,
 } from "../controllers/user.controller.js";
 import verifyJwt from "../middleware/auth.middleware.js";
 import upload from "../middleware/multer.middleware.js";
@@ -18,6 +22,10 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/logout", verifyJwt, logoutUser);
 router.get("/current-user", verifyJwt, getCurrentUser);
+router.post("/sent-verify-otp", verifyJwt, sentVerifyOtp);
+router.post("/verify-account", verifyJwt, verifyEmail);
+router.post("/sent-password-reset-otp", sendPasswordResetOtp);
+router.post("/reset-password", resetPassword);
 router.put("/update-avatar", verifyJwt, upload.single("avatar"), updateAvatar);
 router.put("/update-profile", verifyJwt, updateProfile);
 router.put("/update-password", verifyJwt, updatePassword);

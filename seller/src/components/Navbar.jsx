@@ -8,7 +8,7 @@ import {
 } from "../components/ui/popover";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { getSellerData, backendUrl, sellerData } = useContext(AppContext);
@@ -33,8 +33,11 @@ const Navbar = () => {
   return (
     <div className="flex items-center py-2 px-[4%] justify-between border-b">
       {/* Left Logo */}
+
       <div className="flex items-center gap-2">
-        <img className="w-[90px]" src={assets.logo} alt="logo" />
+        <Link to="/">
+          <img className="w-[90px]" src={assets.logo} alt="logo" />
+        </Link>
       </div>
 
       {/* Right Popover */}
