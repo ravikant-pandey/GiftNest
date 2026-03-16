@@ -6,11 +6,13 @@ import {
   loginSeller,
   logoutSeller,
   registerSeller,
+  resendLoginOtp,
   sellerData,
   storeApprove,
   toggleSellerActive,
   updateStore,
   updateStoreAvatar,
+  verifyLoginOtp,
 } from "../controllers/seller.controller.js";
 import verifySeller from "../middleware/seller.middleware.js";
 import upload from "../middleware/multer.middleware.js";
@@ -20,6 +22,8 @@ const router = express.Router();
 
 router.post("/register-seller", registerSeller);
 router.post("/login-seller", loginSeller);
+router.post("/verify-login-otp", verifyLoginOtp);
+router.post("/resend-otp", resendLoginOtp);
 router.get("/logout-seller", verifySeller, logoutSeller);
 router.get("/current-seller", verifySeller, getCurrentSeller);
 router.put(

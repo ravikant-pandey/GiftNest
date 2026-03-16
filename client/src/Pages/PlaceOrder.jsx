@@ -46,7 +46,6 @@ const PlaceOrder = () => {
 
     if (!userData.isVerified) {
       toast.error("Please verify your email to place order");
-      return navigate("/email-verify");
     }
     try {
       let price = getCartAmount();

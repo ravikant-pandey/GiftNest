@@ -29,10 +29,19 @@ const adminSchema = new Schema(
       type: String, // Cloudinary URL
       default: "",
     },
+
+    logInOtp: {
+      type: String,
+      default: "",
+    },
+    logInOtpExpiryAt: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 adminSchema.pre("save", async function () {

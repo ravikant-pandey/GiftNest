@@ -5,7 +5,6 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { cookieOptions } from "../utils/cookiesOption.js";
 import transporter from "../config/nodemailer.js";
-import bcrypt from "bcryptjs";
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
   try {
@@ -56,7 +55,7 @@ const registerUser = asyncHandler(async (req, res) => {
   );
 
   const mailOptions = {
-    from: process.env.SENDER_EMAIL,
+    from: `"GiftNest" <${process.env.SENDER_EMAIL}>`,
     to: email,
     subject: "Welcome To GiftNest! 🎉",
     html: `
@@ -388,7 +387,8 @@ const sentVerifyOtp = async (req, res) => {
     await user.save();
 
     const mailOptions = {
-      from: process.env.SENDER_EMAIL, // your verified sender email
+      from: `"GiftNest" <${process.env.SENDER_EMAIL}>`,
+    // your verified sender email
       to: user.email, // recipient
       subject: "Verify Your Account - OTP Verification",
       html: `
@@ -713,7 +713,8 @@ const sendPasswordResetOtp = async (req, res) => {
     user.resetOtpExpiryAt = Date.now() + 300000;
     await user.save();
     const mailOptions = {
-      from: process.env.SENDER_EMAIL, // your verified sender email
+      from: `"GiftNest" <${process.env.SENDER_EMAIL}>`,
+     // your verified sender email
       to: user.email, // recipient
       subject: "Reset Your Password - OTP Verification",
       html: ` <body

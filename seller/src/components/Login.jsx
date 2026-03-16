@@ -2,13 +2,13 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../Context/AppContext.jsx";
 import axios from "axios";
-import toast from "react-hot-toast"; 
+import toast from "react-hot-toast";
 import { Lock, Mail, Phone, Store, User } from "lucide-react";
 
 function Login() {
   const [mode, setMode] = useState("login"); // 'login' or 'signup'
 
-  const { backendUrl, getSellerData } = useContext(AppContext);
+  const { backendUrl } = useContext(AppContext);
 
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -55,9 +55,12 @@ function Login() {
         }
 
         if (mode === "login") {
-          localStorage.setItem("sellerLoggedIn", true);
-          await getSellerData();
-          navigate("/");
+          toast.success(data.message);
+          navigate("/verify", { state: { emailOrPhone } });
+          setPassword("");
+          setEmailOrPhone("");
+          setLoading(false);
+          return;
         }
       } else {
         toast.error(data.message);

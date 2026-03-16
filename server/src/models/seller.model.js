@@ -54,6 +54,14 @@ const sellerSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    logInOtp: {
+      type: String,
+      default: "",
+    },
+    logInOtpExpiryAt: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

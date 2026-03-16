@@ -21,10 +21,10 @@ const Login = () => {
       );
 
       if (data.success) {
+        // Redirect to OTP verification page
         toast.success(data.message);
-        localStorage.setItem("isAdminLoggedIn", "true");
-        await fetchAdminData();
-        navigate("/dashboard"); // ⭐ redirect after login
+
+        navigate("/verify", { state: { emailOrPhone: email } });
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");

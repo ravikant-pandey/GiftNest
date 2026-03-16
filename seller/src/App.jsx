@@ -14,11 +14,18 @@ import IsApproved from "./pages/IsApproved";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import LoadingAnimation from "./components/Loading";
+import EmailVerify from "./pages/EmailVerify";
 const App = () => {
   const { sellerLoggedIn, sellerData } = useContext(AppContext);
 
   if (!sellerLoggedIn) {
-    return <Login />;
+    return (
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/verify" element={<EmailVerify />} />
+        <Route path="*" element={<Login />} />
+      </Routes>
+    );
   }
 
   if (!sellerData) {

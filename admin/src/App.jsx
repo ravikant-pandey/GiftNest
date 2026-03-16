@@ -13,6 +13,7 @@ import Store from "./pages/Store";
 import ApproveStores from "./pages/ApproveStores";
 import LoadingIndicator from "./components/Loading";
 import Admin from "./pages/Admin";
+import EmailVerify from "./pages/EmailVerify";
 const App = () => {
   const { isAdminLoggedIn, authLoading } = useContext(AppContext);
   const location = useLocation();
@@ -52,6 +53,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/verify" element={<EmailVerify />} />
       </Routes>
     </>
   );
