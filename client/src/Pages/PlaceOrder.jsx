@@ -36,6 +36,8 @@ const PlaceOrder = () => {
     setFormData((data) => ({ ...data, [name]: value }));
   };
 
+  const { amount } = getCartAmount();
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
@@ -48,7 +50,7 @@ const PlaceOrder = () => {
       toast.error("Please verify your email to place order");
     }
     try {
-      let price = getCartAmount();
+      let price = amount;
 
       if (price <= 500) {
         price += delivery_fees;
@@ -68,7 +70,7 @@ const PlaceOrder = () => {
         );
 
         if (data.success) {
-          setCartItems([]); // 🔥 array empty
+          setCartItems([]); //  array empty
           navigate("/orders");
         } else {
           toast.error(data.message);

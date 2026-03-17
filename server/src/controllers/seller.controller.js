@@ -815,7 +815,7 @@ Seller Account Notification
 <tr>
 <td style="padding:0 35px 10px 35px;color:#444;font-size:15px;line-height:1.6">
 
-Hello <strong>${seller.name || "Seller"}</strong>,
+Hello <strong>${seller.ownerName || "Seller"}</strong>,
 
 <br><br>
 

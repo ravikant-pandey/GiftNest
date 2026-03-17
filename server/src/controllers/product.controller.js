@@ -5,12 +5,13 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 // get all products
 const getAllProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await Product.find().populate({
-      path: "seller",
-      match: { isActive: true }, // only active sellers
-    });
+    const products = await Product.find()
+      .sort({ createdAt: -1 }) // latest products first
+      .populate({
+        path: "seller",
+        match: { isActive: true }, // only active sellers
+      });
 
-    // populate match se inactive sellers null ho jate hain
     const filteredProducts = products.filter((p) => p.seller != null);
 
     return res.status(200).json({
@@ -30,11 +31,13 @@ const createProduct = asyncHandler(async (req, res) => {
   const {
     title,
     description,
+    mrp,
     price,
     category,
     subCategory,
     bestseller,
     stock,
+    deliveryDays,
   } = req.body;
 
   // Debug (optional)
@@ -56,8 +59,10 @@ const createProduct = asyncHandler(async (req, res) => {
 
   // Convert form-data types
   const parsedData = {
+    mrp: Number(mrp),
     price: Number(price),
     stock: Number(stock),
+    deliveryDays: Number(deliveryDays),
     bestseller: bestseller === "true",
   };
 
@@ -158,6 +163,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     const {
       title,
       description,
+      mrp,
       price,
       category,
       subCategory,
@@ -169,6 +175,7 @@ const updateProduct = asyncHandler(async (req, res) => {
       {
         title,
         description,
+        mrp,
         price,
         category,
         subCategory,

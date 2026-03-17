@@ -13,6 +13,11 @@ const productSchema = new Schema(
       required: true,
       minlength: 10,
     },
+    mrp: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
     price: {
       type: Number,
       required: true,
@@ -43,7 +48,12 @@ const productSchema = new Schema(
       default: 0,
       min: 0,
     },
-
+    deliveryDays: {
+      type: String,
+      required: true,
+      min: 1,
+      default: 3,
+    },
     seller: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Seller",

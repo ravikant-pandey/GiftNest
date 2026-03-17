@@ -121,16 +121,20 @@ const AppContextProvider = ({ children }) => {
   // CART TOTAL AMOUNT
   const getCartAmount = () => {
     let amount = 0;
+    let totalMrp = 0;
 
     cartItems.forEach((item) => {
       const product = products.find((p) => p._id === item.productId);
 
       if (product) {
         amount += item.quantity * product.price;
+        totalMrp += item.quantity * product.mrp;
       }
     });
 
-    return amount;
+    const discount = totalMrp - amount;
+
+    return { amount, totalMrp, discount };
   };
 
   // FETCH USER DATA
@@ -144,6 +148,11 @@ const AppContextProvider = ({ children }) => {
         setUserData(data.data);
       }
     } catch (error) {}
+  };
+
+  // isInCart
+  const isInCart = (productId) => {
+    return cartItems.some((item) => item.productId === productId);
   };
 
   useEffect(() => {
@@ -192,6 +201,7 @@ const AppContextProvider = ({ children }) => {
     // misc
     backendUrl,
     navigate,
+    isInCart,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

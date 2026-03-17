@@ -13,11 +13,13 @@ const Add = () => {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [mrp, setMrp] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
   const [bestseller, setBestseller] = useState(false);
   const [stock, setStock] = useState("");
+  const [deliveryDays, setDeliveryDays] = useState("");
 
   const onSubmitHandler = async (e) => {
     try {
@@ -26,11 +28,13 @@ const Add = () => {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("description", description);
+      formData.append("mrp", mrp);
       formData.append("price", price);
       formData.append("category", category);
       formData.append("subCategory", subCategory);
       formData.append("bestseller", bestseller);
       formData.append("stock", stock);
+      formData.append("deliveryDays", deliveryDays);
 
       // ⭐ IMPORTANT — SAME KEY FOR ALL IMAGES
       image1 && formData.append("images", image1);
@@ -58,6 +62,8 @@ const Add = () => {
         setImage2(false);
         setImage3(false);
         setImage4(false);
+        setBestseller(false);
+        setDeliveryDays("");
       } else {
         toast.error(data.message);
       }
@@ -71,6 +77,7 @@ const Add = () => {
       onSubmit={onSubmitHandler}
       className="flex flex-col w-full items-start gap-3"
     >
+      {/* IMAGES */}
       <div>
         <p className="mb-2">Upload Image</p>
         <div className="flex gap-2">
@@ -128,6 +135,8 @@ const Add = () => {
           </label>
         </div>
       </div>
+
+      {/* TITLE */}
       <div className="w-full">
         <p className="mb-2">Product Name</p>
         <input
@@ -139,6 +148,8 @@ const Add = () => {
           required
         />
       </div>
+
+      {/* DESCRIPTION */}
       <div className="w-full">
         <p className="mb-2">Product Description</p>
         <textarea
@@ -151,6 +162,8 @@ const Add = () => {
           required
         />
       </div>
+
+      {/* CATEGORY */}
       <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
         <div>
           <p className="mb-2">Product Category</p>
@@ -172,6 +185,7 @@ const Add = () => {
             <option value="plants">Plants</option>
           </select>
         </div>
+        {/* SUB CATEGORY */}
         <div>
           <p className="mb-2">Sub Category</p>
           <select
@@ -187,18 +201,35 @@ const Add = () => {
             <option value="kids">Kids</option>
           </select>
         </div>
-        <div>
-          <p className="mb-2">Product Price</p>
-          <input
-            className="w-full px-3 py-2 sm:w-[120px]"
-            type="Number"
-            placeholder="25"
-            onChange={(e) => setPrice(e.target.value)}
-            value={price}
-            required
-          />
-        </div>
       </div>
+
+      {/* MRP */}
+      <div className="max-w-2xl">
+        <p className="mb-2">MRP (Actual Price)</p>
+        <input
+          className="w-full px-3 py-2 sm:w-[120px] border p-2 rounded"
+          type="Number"
+          placeholder="25"
+          onChange={(e) => setMrp(e.target.value)}
+          value={mrp}
+          required
+        />
+      </div>
+
+      {/* PRICE */}
+      <div>
+        <p className="mb-2 max-w-2xl">Product Price</p>
+        <input
+          className="w-full px-3 py-2 sm:w-[120px] border p-2 rounded "
+          type="Number"
+          placeholder="25"
+          onChange={(e) => setPrice(e.target.value)}
+          value={price}
+          required
+        />
+      </div>
+
+      {/* STOCK */}
       <div>
         <p className="mb-2">Product Stock</p>
         <input
@@ -210,6 +241,24 @@ const Add = () => {
           required
         />
       </div>
+
+      {/* DELIVERY DAYS */}
+      <div className="max-w-2xl">
+        <p className="mb-2">Delivery Days</p>
+        <select
+          value={deliveryDays}
+          onChange={(e) => setDeliveryDays(e.target.value)}
+          className="border p-2 rounded w-full"
+        >
+          <option value="">Select Delivery Days</option>
+          <option value="1">1 Day</option>
+          <option value="3">3 Days</option>
+          <option value="5">5 Days</option>
+          <option value="7">7 Days</option>
+        </select>
+      </div>
+
+      {/* BESTSELLER */}
       <div className="flex gap-2 mt-2">
         <input
           onChange={() => setBestseller((prev) => !prev)}
@@ -221,6 +270,8 @@ const Add = () => {
           Add to bestseller
         </label>
       </div>
+
+      {/* SUBMIT BUTTON */}
       <button className="w-28 py-3 mt-4 bg-black text-white" type="submit">
         ADD
       </button>

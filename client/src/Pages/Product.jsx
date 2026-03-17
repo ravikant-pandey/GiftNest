@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { assets } from "../assets/frontend_assets/assets";
 import RelatedProducts from "../Components/RelatedProducts/RelatedProducts";
 import { AppContext } from "../Context/AppContext";
@@ -8,13 +8,15 @@ import toast from "react-hot-toast";
 
 const Product = () => {
   const { productId } = useParams();
-  const { products, backendUrl, currency, addToCart } = useContext(AppContext);
+  const { products, backendUrl, currency, addToCart, isInCart } =
+    useContext(AppContext);
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
   const [personalisedText, setPersonalisedText] = useState("");
   const [personalisedImage, setPersonalisedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
 
+  const navigate = useNavigate();
   const fetchProductData = async () => {
     try {
       const { data } = await axios.post(`${backendUrl}/product/single`, {
@@ -29,44 +31,64 @@ const Product = () => {
     }
   };
 
-const handleAddToCart = async () => {
-  if (productData.category === "customizable") {
-    if (!personalisedText.trim() && !personalisedImage) {
-      toast.error("Please add text or upload image");
+  const getDeliveryInfo = () => {
+    if (!productData?.deliveryDays) return null;
+
+    const days = Number(productData.deliveryDays); // convert to number
+
+    const today = new Date();
+    const deliveryDate = new Date(today); // copy today date
+
+    deliveryDate.setDate(today.getDate() + days);
+
+    const day = deliveryDate.getDate();
+    const month = deliveryDate.toLocaleString("en-IN", { month: "short" });
+    const weekday = deliveryDate.toLocaleString("en-IN", { weekday: "short" });
+
+    return {
+      days,
+      date: `${day} ${month}, ${weekday}`,
+    };
+  };
+  const deliveryInfo = getDeliveryInfo();
+
+  const handleAddToCart = async () => {
+    if (productData.category === "customizable") {
+      if (!personalisedText.trim() && !personalisedImage) {
+        toast.error("Please add text or upload image");
+        return;
+      }
+
+      let imageUrl = null;
+
+      try {
+        if (personalisedImage) {
+          const formData = new FormData();
+          formData.append("image", personalisedImage);
+
+          const uploadRes = await axios.post(
+            `${backendUrl}/upload/upload-custom-image`,
+            formData,
+            {
+              withCredentials: true,
+              headers: { "Content-Type": "multipart/form-data" },
+            },
+          );
+
+          imageUrl = uploadRes.data.imageUrl;
+        }
+
+        addToCart(productData._id, personalisedText || null, imageUrl || null);
+      } catch (error) {
+        toast.error(error.response?.data?.message || error.message);
+      }
+
       return;
     }
 
-    let imageUrl = null;
-
-    try {
-      if (personalisedImage) {
-        const formData = new FormData();
-        formData.append("image", personalisedImage);
-
-        const uploadRes = await axios.post(
-          `${backendUrl}/upload/upload-custom-image`,
-          formData,
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "multipart/form-data" },
-          },
-        );
-
-        imageUrl = uploadRes.data.imageUrl;
-      }
-
-      addToCart(productData._id, personalisedText || null, imageUrl || null);
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-    }
-
-    return;
-  }
-
-  // normal product
-  addToCart(productData._id);
-};
-
+    // normal product
+    addToCart(productData._id);
+  };
 
   useEffect(() => {
     fetchProductData();
@@ -108,10 +130,24 @@ const handleAddToCart = async () => {
             <img className="w-3.5" src={assets.star_dull_icon} alt="" />
             <p className="pl-2">122</p>
           </div>
-          <p className="mt-5 text-3xl font-medium">
-            {currency}
-            {productData.price}
-          </p>
+          <div className="mt-5 flex items-center gap-3">
+            <p className="text-3xl font-medium">
+              {currency}
+              {productData.price}
+            </p>
+
+            <p className="text-gray-500 line-through">
+              {currency}
+              {productData.mrp}
+            </p>
+
+            <p className="text-green-600 font-medium">
+              {Math.ceil(
+                ((productData.mrp - productData.price) / productData.mrp) * 100,
+              )}
+              % OFF
+            </p>
+          </div>
           <p className="mt-5 text-gray-500 md:w-4/5">
             {productData.description}
           </p>
@@ -172,12 +208,35 @@ const handleAddToCart = async () => {
             </div>
           )}
 
-          <button
-            onClick={handleAddToCart}
-            className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700 mt-4 rounded-2xl"
-          >
-            ADD TO CART
-          </button>
+          {/* Delivery */}
+          <div className="mt-6">
+            <hr className="mt-8 sm:w-4/5" />
+
+            {deliveryInfo && (
+              <div className="mt-4 text-sm text-gray-700 flex flex-col gap-1">
+                <p>🚚 Delivered in {deliveryInfo.days} Days</p>
+                <p>📅 Delivery by {deliveryInfo.date}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Cart and go to cart */}
+
+          {!isInCart(productData._id) ? (
+            <button
+              onClick={handleAddToCart}
+              className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700 mt-4 rounded-2xl"
+            >
+              ADD TO CART
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate("/cart")}
+              className="text-black border border-gray-400 px-10 py-3 text-bold active:bg-gray-700 mt-4 rounded-2xl cursor-pointer hover:bg-gray-100"
+            >
+              GO TO CART
+            </button>
+          )}
           <hr className="mt-8 sm:w-4/5" />
           <div className="text-sm text-gray-500 mt-5 flex flex-col gap-1">
             <p>100% Original product.</p>
