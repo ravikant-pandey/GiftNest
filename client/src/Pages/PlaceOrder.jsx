@@ -31,6 +31,43 @@ const PlaceOrder = () => {
     phone: "",
   });
 
+  const initPay = (order) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: order.amount, // ✅ already in paise
+      currency: "INR",
+      name: "Order Payment",
+      description: "Order Payment",
+      order_id: order.id,
+      receipt: order.receipt,
+      handler: async (response) => {
+        try {
+          const { data } = await axios.post(
+            `${backendUrl}/order/verify-razorpay`,
+            {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+            },
+            { withCredentials: true },
+          );
+
+          if (data.success) {
+            setCartItems([]);
+            navigate("/orders");
+            toast.success(data.message);
+          } else {
+            toast.error(data.message);
+            window.location.reload();
+          }
+        } catch (error) {}
+      },
+    };
+
+    const rzp1 = new window.Razorpay(options);
+    rzp1.open();
+  };
+
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
     setFormData((data) => ({ ...data, [name]: value }));
@@ -45,10 +82,6 @@ const PlaceOrder = () => {
       toast.error("Cart is empty");
       return;
     }
-
-    if (!userData.isVerified) {
-      toast.error("Please verify your email to place order");
-    }
     try {
       let price = amount;
 
@@ -58,7 +91,7 @@ const PlaceOrder = () => {
 
       const orderData = {
         address: formData,
-        product: cartItems, // 🔥 direct send
+        product: cartItems, // direct send
         amount: price,
       };
 
@@ -88,6 +121,17 @@ const PlaceOrder = () => {
           window.location.replace(data.session_url);
         } else {
           toast.error(data.message);
+        }
+      }
+      if (method === "razorpay") {
+        const responseRazorPay = await axios.post(
+          `${backendUrl}/order/razorpay`,
+          orderData,
+          { withCredentials: true },
+        );
+
+        if (responseRazorPay.data.success) {
+          initPay(responseRazorPay.data.order);
         }
       }
     } catch (error) {
@@ -198,6 +242,19 @@ const PlaceOrder = () => {
           <Title text1={"PAYMENT"} text2={"METHOD"} />
 
           <div className="flex gap-3 flex-col lg:flex-row">
+            <div
+              onClick={() => setMethod("razorpay")}
+              className="flex items-center gap-3 border p-2 px-3 cursor-pointer"
+            >
+              <p
+                className={`min-w-3.5 h-3.5 border rounded-full ${method === "razorpay" ? "bg-green-400" : ""}`}
+              ></p>
+              <img
+                className={`h-5 mx-4`}
+                src={assets.razorpay_logo}
+                alt="Razorpay"
+              />
+            </div>
             <div
               onClick={() => setMethod("stripe")}
               className="flex items-center gap-3 border p-2 px-3 cursor-pointer"

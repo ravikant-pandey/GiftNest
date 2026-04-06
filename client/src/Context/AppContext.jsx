@@ -31,6 +31,7 @@ const AppContextProvider = ({ children }) => {
 
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [refunds, setRefunds] = useState([]);
 
   // FETCH PRODUCTS
   const getProducts = async () => {
@@ -161,6 +162,28 @@ const AppContextProvider = ({ children }) => {
     }
   }, [isLoggedIn, token]);
 
+  // refunds
+  const getRefunds = async () => {
+    try {
+      const { data } = await axios.get(
+        `${backendUrl}/refund/get-refund-of-user`,
+        {
+          withCredentials: true,
+        },
+      );
+      if (data.success) {
+        setRefunds(data.refund);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      getRefunds();
+    }
+  }, [isLoggedIn]);
   // CONTEXT VALUE
   const value = {
     // product
@@ -202,6 +225,10 @@ const AppContextProvider = ({ children }) => {
     backendUrl,
     navigate,
     isInCart,
+
+    // refund
+    refunds,
+    getRefunds,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

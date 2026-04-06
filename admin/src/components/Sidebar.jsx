@@ -1,7 +1,8 @@
 import { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
-import { House, ShieldCheck, ShoppingBag, Users } from "lucide-react";
+import { BadgeIndianRupee, House, ShieldCheck, ShoppingBag, Users } from "lucide-react";
+import { RiRefund2Line } from "react-icons/ri";
 
 const Sidebar = () => {
   const { isAdminLoggedIn } = useContext(AppContext);
@@ -60,6 +61,19 @@ const Sidebar = () => {
           >
             <ShoppingBag className="min-w-5" />
             <p className="hidden md:block">Orders</p>
+          </NavLink>
+
+          {/* Orders */}
+          <NavLink
+            to="/refunds"
+            className={({ isActive }) =>
+              `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
+                isActive ? "bg-[#F2F3FF] border-r-4 border-primary" : ""
+              }`
+            }
+          >
+            <BadgeIndianRupee className="min-w-5" />
+            <p className="hidden md:block">Refunds</p>
           </NavLink>
         </ul>
       )}

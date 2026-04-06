@@ -5,9 +5,15 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { Product } from "../models/product.model.js";
 import Stripe from "stripe";
 import transporter from "../config/nodemailer.js";
+import Razorpay from "razorpay";
 
 // gateway initialize
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+const razorpayInstance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 // place order
 const placeOrder = asyncHandler(async (req, res) => {
@@ -841,6 +847,146 @@ MRP Rs.${item.mrp}
   });
 });
 
+// placing order using razorpay
+const placeOrderRazorpay = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { product, address } = req.body;
+    if (!product || product.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No products provided",
+      });
+    }
+
+    let orderAmount = 0;
+    const line_items = [];
+    const cleanProducts = [];
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    //  Fetch all products in one query
+    const productIds = product.map((item) => item.productId);
+    const productsFromDB = await Product.find({
+      _id: { $in: productIds },
+    });
+
+    for (const item of product) {
+      const productData = productsFromDB.find(
+        (p) => p._id.toString() === item.productId,
+      );
+
+      if (!productData || item.quantity <= 0) continue;
+
+      const itemTotal = productData.price * item.quantity;
+      orderAmount += itemTotal;
+
+      cleanProducts.push({
+        productId: productData._id,
+        quantity: item.quantity,
+        customeText: item.customeText || "",
+        customeImage: item.customeImage || "",
+      });
+
+      line_items.push({
+        price_data: {
+          currency: "inr",
+          product_data: {
+            name: productData.title,
+          },
+          unit_amount: productData.price * 100,
+        },
+        quantity: item.quantity,
+      });
+    }
+
+    if (cleanProducts.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid products found",
+      });
+    }
+
+    const deliveryCharges = orderAmount > 500 ? 0 : 99;
+    const totalAmount = orderAmount + deliveryCharges;
+
+    if (deliveryCharges > 0) {
+      line_items.push({
+        price_data: {
+          currency: "inr",
+          product_data: { name: "Delivery Charges" },
+          unit_amount: deliveryCharges * 100,
+        },
+        quantity: 1,
+      });
+    }
+
+    const order = await Order.create({
+      user: userId,
+      product: cleanProducts,
+      amount: totalAmount,
+      address,
+      isPaid: false,
+      paymentMethod: "RAZORPAY",
+    });
+
+    const options = {
+      amount: totalAmount * 100, // amount in the smallest currency unit
+      currency: "INR",
+      receipt: `order_rcptid_${order._id}`,
+    };
+    const orderRazorpay = await razorpayInstance.orders.create(options);
+
+    return res.status(200).json({
+      success: true,
+      order: orderRazorpay,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// verify razorpay
+const verifyRazorpay = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { razorpay_order_id } = req.body;
+    const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
+    const mongoId = orderInfo.receipt.replace("order_rcptid_", "");
+    if (orderInfo.status === "paid") {
+      await Order.findByIdAndUpdate(mongoId, { isPaid: true }, { new: true });
+      await User.findByIdAndUpdate(userId, {
+        $set: { cart: [] },
+      });
+      res.status(200).json({
+        success: true,
+        message: "Order placed successfully",
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "Order failed",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 // get orders for logged in user
 const getOrdersForUser = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -955,6 +1101,73 @@ const getOrdersForAdmin = asyncHandler(async (req, res) => {
   });
 });
 
+// self order cancel
+import mongoose from "mongoose";
+
+const cancelOrder = asyncHandler(async (req, res) => {
+  const { orderId } = req.body;
+  const userId = req.user._id;
+
+  if (!orderId) {
+    return res.status(400).json({
+      success: false,
+      message: "Order ID required",
+    });
+  }
+
+  // Validate ObjectId
+  if (!mongoose.Types.ObjectId.isValid(orderId)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Order ID",
+    });
+  }
+
+  // First find order
+  const order = await Order.findById(orderId);
+
+  if (!order) {
+    return res.status(404).json({
+      success: false,
+      message: "Order not found",
+    });
+  }
+
+  // Security check
+  if (order.user.toString() !== userId.toString()) {
+    return res.status(403).json({
+      success: false,
+      message: "Unauthorized",
+    });
+  }
+
+  // Already cancelled check
+  if (order.status === "Cancelled") {
+    return res.status(400).json({
+      success: false,
+      message: "Order already cancelled",
+    });
+  }
+
+  // // Optional: paid order restriction
+  // if (order.isPaid) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message: "Paid order cannot be cancelled",
+  //   });
+  // }
+
+  // Update
+  order.status = "Cancelled";
+  await order.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Order cancelled successfully",
+    order,
+  });
+});
+
 export {
   placeOrder,
   placeOrderUsingStripe,
@@ -962,6 +1175,7 @@ export {
   getAllOrders,
   updateOrderStatus,
   getOrdersForAdmin,
+  placeOrderRazorpay,
+  verifyRazorpay,
+  cancelOrder,
 };
-
-uploadOnCloudinary();

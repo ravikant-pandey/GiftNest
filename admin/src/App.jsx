@@ -14,6 +14,7 @@ import ApproveStores from "./pages/ApproveStores";
 import LoadingIndicator from "./components/Loading";
 import Admin from "./pages/Admin";
 import EmailVerify from "./pages/EmailVerify";
+import Refunds from "./pages/Refunds";
 const App = () => {
   const { isAdminLoggedIn, authLoading } = useContext(AppContext);
   const location = useLocation();
@@ -41,6 +42,7 @@ const App = () => {
             <Route path="/stores" element={<Store />} />
             <Route path="*" element={<Navigate to="/dashboard" />} />
             <Route path="/admin-profile" element={<Admin />} />
+            <Route path="/refunds" element={<Refunds />} />
           </Routes>
         </div>
       </div>

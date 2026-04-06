@@ -3,10 +3,19 @@ import Title from "../Components/Title/Title";
 import axios from "axios";
 import { AppContext } from "../Context/AppContext";
 import toast from "react-hot-toast";
+import RefundForm from "./RefundForm";
 
 const Orders = () => {
-  const { currency, backendUrl, isLoggedIn } = useContext(AppContext);
+  const { currency, backendUrl, isLoggedIn, refunds } = useContext(AppContext);
   const [orderData, setOrderData] = useState([]);
+  const [showRefundForm, setShowRefundForm] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState({
+    orderId: "",
+    amount: 0,
+  });
+  const closeRefundForm = () => {
+    setShowRefundForm(false);
+  };
   const loadOrderData = async () => {
     try {
       if (!isLoggedIn) return;
@@ -33,6 +42,8 @@ const Orders = () => {
 
           formattedOrders.push({
             ...item,
+            orderId: order._id,
+            amount: order.amount,
             status: order.status,
             paymentMethod: order.paymentMethod,
             date: order.createdAt,
@@ -41,6 +52,26 @@ const Orders = () => {
       });
 
       setOrderData(formattedOrders);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const cancelOrder = async (orderId) => {
+    console.log(orderId);
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/order/cancel-order`,
+        { orderId },
+        { withCredentials: true },
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        loadOrderData();
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
       toast.error(error.message);
     }
@@ -129,17 +160,58 @@ const Orders = () => {
                   <p className="min-w-2 h-2 rounded-full bg-green-500"></p>
                   <p className="text-sm md:text-base">{item.status}</p>
                 </div>
-
-                <button
-                  onClick={loadOrderData}
-                  className="border px-4 py-2 text-sm font-medium rounded-sm"
-                >
-                  Track Order
-                </button>
+                {/* Cancel and if payment method is Stripe or RAZORPAY so refund */}
+                {item.status === "Cancelled" ? (
+                  <button
+                    onClick={() => {
+                      setSelectedOrder({
+                        orderId: item.orderId,
+                        amount: item.amount,
+                      });
+                      setShowRefundForm(true);
+                    }}
+                    className="border px-4 py-2 text-sm font-medium rounded-sm bg-green-500 text-white cursor-pointer"
+                  >
+                    Refund Now
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => cancelOrder(item.orderId)}
+                    className="border px-4 py-2 text-sm font-medium rounded-sm bg-red-500 text-white cursor-pointer"
+                  >
+                    Cancel Order
+                  </button>
+                )}
               </div>
+              {item.status === "Cancelled" &&
+                (item.paymentMethod === "stripe" ||
+                  item.paymentMethod === "RAZORPAY") && (
+                  <p className="text-sm text-green-600">
+                    Refund will be {refunds.status}
+                  </p>
+                )}
             </div>
           );
         })}
+
+        {showRefundForm && (
+          <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
+            <div className="bg-white p-6 rounded-lg">
+              <RefundForm
+                orderId={selectedOrder.orderId}
+                amount={selectedOrder.amount}
+                onClose={closeRefundForm}
+              />
+
+              <button
+                onClick={() => setShowRefundForm(false)}
+                className="mt-4 text-red-500"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ const AppContextProvider = ({ children }) => {
   const [sellers, setSellers] = useState([]);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [refunds, setRefunds] = useState([]);
 
   // Fetch Admin Session
   const fetchAdminData = async () => {
@@ -72,11 +73,25 @@ const AppContextProvider = ({ children }) => {
     } catch (error) {}
   };
 
+  const fetchRefundData = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/refund/refunds`, {
+        withCredentials: true,
+      });
+      if (data.success) {
+        setRefunds(data.refunds);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  };
+
   // automatically fetch
   useEffect(() => {
     if (isAdminLoggedIn) {
       fetchProductData();
       fetchOrderData();
+      fetchRefundData();
     }
   }, [isAdminLoggedIn]);
 
@@ -115,6 +130,9 @@ const AppContextProvider = ({ children }) => {
     orders,
     setOrders,
     fetchOrderData,
+    refunds,
+    setRefunds,
+    fetchRefundData,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
