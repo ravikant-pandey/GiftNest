@@ -24,14 +24,6 @@ const getRefund = asyncHandler(async (req, res) => {
     accountHolderName,
   } = req.body;
 
-  console.log(
-    orderId,
-    amount,
-    accountNumber,
-    bankName,
-    ifscCode,
-    accountHolderName,
-  );
   // ✅ Validation
   if (
     !orderId ||
