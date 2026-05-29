@@ -34,7 +34,7 @@ const Sidebar = () => {
             }
           >
             <ShieldCheck className="min-w-5" />
-            <p className="hidden md:block">Approve Store</p>
+            <p className="hidden md:block">Approval Requests</p>
           </NavLink>
 
           {/* Seller List */}

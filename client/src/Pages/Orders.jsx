@@ -6,9 +6,16 @@ import toast from "react-hot-toast";
 import RefundForm from "./RefundForm";
 
 const Orders = () => {
-  const { currency, backendUrl, isLoggedIn, refunds } = useContext(AppContext);
+  const {
+    currency,
+    backendUrl,
+    isLoggedIn,
+    refunds = [],
+    getRefunds,
+  } = useContext(AppContext);
 
   const [orderData, setOrderData] = useState([]);
+  const [loading, setLoading] = useState(true); // 🔥 loading added
   const [showRefundForm, setShowRefundForm] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState({
     orderId: "",
@@ -17,10 +24,12 @@ const Orders = () => {
 
   const closeRefundForm = () => setShowRefundForm(false);
 
-  // Load Orders
+  // 🔹 Load Orders
   const loadOrderData = async () => {
     try {
       if (!isLoggedIn) return;
+
+      setLoading(true);
 
       const { data } = await axios.get(backendUrl + "/order/my-orders", {
         withCredentials: true,
@@ -46,9 +55,6 @@ const Orders = () => {
             status: order.status,
             paymentMethod: order.paymentMethod,
             date: order.createdAt,
-
-            // IMPORTANT
-            refundStatus: order.refundStatus || "none",
           });
         });
       });
@@ -56,10 +62,12 @@ const Orders = () => {
       setOrderData(formattedOrders);
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Cancel Order
+  // 🔹 Cancel Order
   const cancelOrder = async (orderId) => {
     try {
       const { data } = await axios.post(
@@ -80,10 +88,21 @@ const Orders = () => {
   };
 
   useEffect(() => {
-    loadOrderData();
+    if (isLoggedIn) {
+      loadOrderData();
+    }
   }, [isLoggedIn]);
 
-  // Empty State
+  // 🔥 Loading UI
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <p className="text-lg text-gray-500">Loading orders...</p>
+      </div>
+    );
+  }
+
+  // 🔥 Empty state
   if (!orderData.length) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -94,13 +113,17 @@ const Orders = () => {
     );
   }
 
+  const refreshAll = async () => {
+    await loadOrderData();
+    await getRefunds();
+  };
+
   return (
     <div className="border-t pt-16 px-4">
       <div className="text-2xl mb-8">
-        <Title text1={"MY"} text2={"ORDERS"} />
+        <Title text1="MY" text2="ORDERS" />
       </div>
 
-      {/* ORDER CARDS */}
       {orderData.map((item) => {
         const product = item.productId;
 
@@ -113,30 +136,27 @@ const Orders = () => {
         const isOnlinePayment =
           item.paymentMethod === "stripe" || item.paymentMethod === "RAZORPAY";
 
-        const refundList = Array.isArray(refunds)
-          ? refunds
-          : refunds
-            ? [refunds]
-            : [];
+        // 🔥 Safe refund match
+        const refundList = Array.isArray(refunds) ? refunds : [];
 
         const matchedRefund = refundList.find(
           (r) => String(r.orderId) === String(item.orderId),
         );
 
         const refundStatus = matchedRefund?.status || "none";
-        console.log("refund:", refunds);
-        console.log("itemOrderId:", item.orderId);
-        console.log("refunds:", refundList);
+
+        const canRefund =
+          item.status === "Delivered" ||
+          (item.status === "Cancelled" && isOnlinePayment);
+
         return (
           <div
             key={item._id}
-            className="bg-white border rounded-xl shadow-md p-6 mb-6 
-            flex flex-col gap-5 hover:shadow-lg transition"
+            className="bg-white border rounded-xl shadow-md p-6 mb-6 flex flex-col gap-5 hover:shadow-lg transition"
           >
             {/* HEADER */}
             <div className="flex justify-between items-center border-b pb-3">
               <p className="font-semibold text-lg">Order ID: {item.orderId}</p>
-
               <span className="text-sm px-3 py-1 rounded-full bg-gray-100">
                 {item.status}
               </span>
@@ -193,8 +213,8 @@ const Orders = () => {
             {/* ACTIONS */}
             <div className="flex justify-between items-center border-t pt-4">
               <div className="flex gap-3">
-                {/* */}
-                {!isCancelled && (
+                {/* Cancel */}
+                {!isCancelled && item.status !== "Delivered" && (
                   <button
                     onClick={() => cancelOrder(item.orderId)}
                     className="px-4 py-2 bg-red-500 text-white rounded-md text-sm"
@@ -203,52 +223,60 @@ const Orders = () => {
                   </button>
                 )}
 
-                {/* ✅ Refund */}
-                {item.status === "Cancelled" &&
-                (item.paymentMethod === "stripe" ||
-                  item.paymentMethod === "RAZORPAY") &&
-                refundStatus === "none" ? (
-                  <button
-                    onClick={() => {
-                      setSelectedOrder({
-                        orderId: item.orderId,
-                        amount: item.amount,
-                      });
-                      setShowRefundForm(true);
-                    }}
-                    className="border px-4 py-2 text-sm font-medium rounded-sm bg-green-500 text-white cursor-pointer"
-                  >
-                    Refund Now
-                  </button>
-                ) : (
-                  <button className="text-green-500" disabled>Refund already requested</button>
+                {/* Refund */}
+                {canRefund && (
+                  <div>
+                    {refundStatus === "none" && (
+                      <button
+                        onClick={() => {
+                          setSelectedOrder({
+                            orderId: item.orderId,
+                            amount: item.amount,
+                          });
+                          setShowRefundForm(true);
+                        }}
+                        className="px-4 py-2 bg-green-500 text-white rounded-md text-sm"
+                      >
+                        Return Now
+                      </button>
+                    )}
+
+                    {refundStatus === "pending" && (
+                      <span className="text-yellow-600 text-sm font-medium">
+                        Refund already requested
+                      </span>
+                    )}
+
+                    {refundStatus === "approved" && (
+                      <span className="text-blue-600 text-sm font-medium">
+                        Refund Approved
+                      </span>
+                    )}
+
+                    {refundStatus === "rejected" && (
+                      <span className="text-red-600 text-sm font-medium">
+                        Refund Rejected
+                      </span>
+                    )}
+
+                    {refundStatus === "paid" && (
+                      <span className="text-green-700 text-sm font-medium">
+                        Refund Paid Successfully
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
 
-              {/* Refund Status */}
-              {isCancelled && isOnlinePayment && (
-                <div className="text-sm font-medium">
-                  {item.status === "Cancelled" &&
-                    (item.paymentMethod === "stripe" ||
-                      item.paymentMethod === "RAZORPAY") && (
-                      <p
-                        className={`text-sm font-medium ${
-                          refundStatus === "pending"
-                            ? "text-yellow-600"
-                            : refundStatus === "approved"
-                              ? "text-green-600"
-                              : refundStatus === "rejected"
-                                ? "text-red-600"
-                                : "text-gray-500"
-                        }`}
-                      >
-                        {refundStatus === "none" && "No refund requested"}
-                        {refundStatus === "pending" && "Refund Pending"}
-                        {refundStatus === "approved" && "Refund Approved"}
-                        {refundStatus === "rejected" && "Refund Rejected"}
-                      </p>
-                    )}
-                </div>
+              {/* STATUS */}
+              {canRefund && (
+                <p className="text-sm font-medium">
+                  {refundStatus === "none" && "No refund requested"}
+                  {refundStatus === "pending" && "Refund Pending"}
+                  {refundStatus === "approved" && "Refund Approved"}
+                  {refundStatus === "rejected" && "Refund Rejected"}
+                  {refundStatus === "paid" && "Refund Paid After Order Cancel"}
+                </p>
               )}
             </div>
           </div>
@@ -275,7 +303,10 @@ const Orders = () => {
             <RefundForm
               orderId={selectedOrder.orderId}
               amount={selectedOrder.amount}
-              onClose={closeRefundForm}
+              onClose={() => {
+                setShowRefundForm(false);
+                refreshAll();
+              }}
             />
           </div>
         </div>

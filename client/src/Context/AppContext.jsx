@@ -172,7 +172,7 @@ const AppContextProvider = ({ children }) => {
         },
       );
       if (data.success) {
-        setRefunds(data.refund);
+        setRefunds(data.refunds);
       }
     } catch (error) {
       toast.error(error.message);

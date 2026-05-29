@@ -26,7 +26,7 @@ const List = () => {
 
   return (
     <>
-      <p className="mb-2">All Products List</p>
+      <p className="text-xl font-semibold mb-4">All Products List</p>
 
       {productList && productList.length > 0 ? (
         <div className="flex flex-col gap-2">

@@ -77,6 +77,7 @@ const Add = () => {
       onSubmit={onSubmitHandler}
       className="flex flex-col w-full items-start gap-3"
     >
+      <h1 className="text-xl font-semibold mb-4">Add Product</h1>
       {/* IMAGES */}
       <div>
         <p className="mb-2">Upload Image</p>

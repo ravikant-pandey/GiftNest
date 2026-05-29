@@ -308,28 +308,6 @@ MRP Rs.${item.mrp}
   </td>
 </tr>
 
-          <!-- CTA Button -->
-
-          <tr>
-            <td align="center" style="padding: 10px 30px 35px 30px">
-              <a
-                href="${process.env.BASE_URL}/invoice/${order._id}"
-                style="
-                  background: #2563eb;
-                  color: #ffffff;
-                  text-decoration: none;
-                  padding: 14px 28px;
-                  border-radius: 4px;
-                  font-size: 15px;
-                  font-weight: bold;
-                  display: inline-block;
-                "
-              >
-                Download Invoice (PDF)
-              </a>
-            </td>
-          </tr>
-
           <!-- Footer -->
 
           <tr>
@@ -764,28 +742,6 @@ MRP Rs.${item.mrp}
     </table>
   </td>
 </tr>
-
-          <!-- CTA Button -->
-
-          <tr>
-            <td align="center" style="padding: 10px 30px 35px 30px">
-              <a
-                href="${process.env.BASE_URL}/invoice/${order._id}"
-                style="
-                  background: #2563eb;
-                  color: #ffffff;
-                  text-decoration: none;
-                  padding: 14px 28px;
-                  border-radius: 4px;
-                  font-size: 15px;
-                  font-weight: bold;
-                  display: inline-block;
-                "
-              >
-                Download Invoice (PDF)
-              </a>
-            </td>
-          </tr>
 
           <!-- Footer -->
 

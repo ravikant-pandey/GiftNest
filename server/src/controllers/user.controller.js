@@ -1002,6 +1002,7 @@ const resetPassword = async (req, res) => {
 // update the profile picture
 const updateAvatar = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.file?.path;
+  console.log(avatarLocalPath);
   if (!avatarLocalPath) throw new ApiError(400, "Avatar is required");
   const avatar = await uploadOnCloudinary(avatarLocalPath);
   console.log(avatar);

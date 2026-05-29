@@ -50,7 +50,7 @@ const Orders = () => {
     <>
       {orders.length > 0 ? (
         <div>
-          <h3 className="text-xl font-semibold mb-4">Order Page</h3>
+          <h3 className="text-xl font-semibold mb-4">All Orders</h3>
 
           {orders.map((order) => {
             const totalPrice = (order.product?.price || 0) * order.quantity;

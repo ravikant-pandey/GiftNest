@@ -89,18 +89,22 @@ const getRefund = asyncHandler(async (req, res) => {
 const getRefundOfUser = asyncHandler(async (req, res) => {
   try {
     const userId = req.user._id;
+
     if (!userId) {
       return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
-    const refund = await Refund.findOne({ userId });
+
+    // 🔥 GET ALL REFUNDS
+    const refunds = await Refund.find({ userId });
 
     return res.status(200).json({
       success: true,
-      refund,
+      refunds, // 🔥 IMPORTANT (plural)
     });
+
   } catch (error) {
     console.log(error);
     return res.status(500).json({
